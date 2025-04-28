@@ -9,7 +9,8 @@ section .data
     ;sigint_len equ $ - sigint_msg
 
 section .bss
-    buffer resb 5          ; Store up to 4 chars + newline
+    buffer resb 5           ; Store up to 4 chars + newline
+    cell resb 1             ; a byte to store each cell's char
     ;sigact resb 152        ; sizeof(struct sigaction) = 152 bytes (64-bit)
 
 section .text
@@ -82,35 +83,39 @@ print_column:
     movzx eax, byte [esi]  ; Get the current element
     
     ; Convert number to ASCII and print
-    add eax, '0'           ; Convert to ASCII
-    push ecx               ; Save column counter
-    mov [esi], al          ; Store ASCII value back
+    add al, '0'            ; Convert to ASCII
+    mov [cell], al         ; move ASCII to cell buffer
     
+    push ecx               ; Save column counter
     mov eax, 4             ; sys_write
     mov ebx, 1             ; stdout
-    mov ecx, esi           ; address of current element
+    mov ecx, cell          ; address of current element
     mov edx, 1             ; length to write
     int 0x80               ; call kernel
+    pop ecx                ; Restore column counter
     
     ; Print space
+    push ecx               ; Save column counter
     mov eax, 4
     mov ebx, 1
     mov ecx, space
     mov edx, 1
     int 0x80
-    
     pop ecx                ; Restore column counter
+    
     inc esi                ; Move to next element
     loop print_column
 
     ; Print newline at end of row
+    push ecx               ; Save row counter
     mov eax, 4
     mov ebx, 1
     mov ecx, newline
     mov edx, 1
     int 0x80
-
     pop ecx                ; Restore row counter
+
+    pop ecx                ; Restore rows-left counter (go to next row)
     loop print_row
 
     ret
