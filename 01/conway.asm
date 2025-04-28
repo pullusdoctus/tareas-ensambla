@@ -125,17 +125,82 @@ print_column:
     call check_cell_state
     ; Result is in al (0 or 1)
 
-; TODO: Function to check if a cell will be alive or dead in the next generation
-; Input: esi = address of matrix, edi = cell index
-; Output: al = next state (0 or 1)
+; Function to check if a cell will be alive or dead in the next generation
 check_cell_state:
     push ebx
     push ecx
     push edx
 
+    xor ecx, ecx  ; Initialize neighbor count to 0
+    
+    ; Check all 8 neighboring cells
+    mov ebx, edi
+    sub ebx, 11   ; Top-left
+    call count_if_alive
+    
+    inc ebx       ; Top-center
+    call count_if_alive
+    
+    inc ebx       ; Top-right
+    call count_if_alive
+    
+    add ebx, 9    ; Middle-left
+    call count_if_alive
+    
+    add ebx, 2    ; Middle-right
+    call count_if_alive
+    
+    add ebx, 9    ; Bottom-left
+    call count_if_alive
+    
+    inc ebx       ; Bottom-center
+    call count_if_alive
+    
+    inc ebx       ; Bottom-right
+    call count_if_alive
+
+    ; Apply Conway's Game of Life rules
+    movzx eax, byte [esi + edi]  ; Get current state of the cell
+    cmp ecx, 2
+    jl .die       
+    je .same      
+    cmp ecx, 3
+    je .live      
+    jg .die       
+
+.same:
+   
+    jmp .end
+
+.live:
+    mov al, 1
+    jmp .end
+
+.die:
+    mov al, 0
+
+.end:
     pop edx
     pop ecx
     pop ebx
+    ret
+
+; Function to count live neighbors
+
+count_if_alive:
+    push eax
+    
+   
+    cmp ebx, 0
+    jl .skip
+    cmp ebx, 99
+    jg .skip
+    
+    movzx eax, byte [esi + ebx]
+    add ecx, eax  ; Increment neighbor count if cell is alive (1)
+    
+.skip:
+    pop eax
     ret
 
 clear_buffer:
