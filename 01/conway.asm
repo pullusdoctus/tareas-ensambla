@@ -66,8 +66,19 @@ simulation_loop:
     repe cmpsb
     je exit
 
-    ; If not 'quit', continue game loop
+    ; Update all cells
+    mov esi, matrix
+    mov edi, 0
+    mov ecx, 100  ; 100 cells in total
+
+update_cells:
+    push ecx
     call check_cell_state
+    mov [esi + edi], al  ; Store the new state
+    inc edi
+    pop ecx
+    loop update_cells
+
     call print_matrix
     jmp simulation_loop
 
@@ -166,10 +177,10 @@ check_cell_state:
     je .same      
     cmp ecx, 3
     je .live      
-    jg .die       
+    jg .die      
 
 .same:
-   
+
     jmp .end
 
 .live:
@@ -186,11 +197,10 @@ check_cell_state:
     ret
 
 ; Function to count live neighbors
-
 count_if_alive:
     push eax
     
-   
+    
     cmp ebx, 0
     jl .skip
     cmp ebx, 99
@@ -209,15 +219,6 @@ clear_buffer:
     mov ecx, 5
     rep stosb
     ret
-
-; NOTE: this is for program exiting with CTRL-C
-;handle_sigint:
-    ; Print message
-    ;mov eax, 4
-    ;mov ebx, 1
-    ;mov ecx, sigint_msg
-    ;mov edx, sigint_len
-    ;int 0x80
 
 exit:
     call clear_buffer
