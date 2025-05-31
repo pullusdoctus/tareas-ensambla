@@ -1,27 +1,14 @@
 # tareas-ensambla
 
-- [ ] Celda poblada
-- [ ] Celda no poblada
-- [ ] Inicio (cargar matriz, imprimir matriz)
+## tarea programada 2
 
-- [ ] Fin (chequear próxima celda, preguntar si quiere terminar)
+XD
 
-int main() {
-  cargarMatriz();
-  imprimirMatriz();
-  while (true) {
-   if (!quiereSeguir()) {
-    break;
-  }
-  for  (...) {
-    for (...) {
-      if (celdaPoblada) {
-        celdaPoblada();
-      } else {
-        celdaNoPoblada();
-      }
-    }
-  }
-  imprimirMatriz();
-  }
-}
+## lab refugio
+
+diseño en
+
+- [ ] información personal
+- [ ] información de contacto
+- [ ] información de domicilio
+- [ ] verificación
