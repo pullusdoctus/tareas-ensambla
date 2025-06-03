@@ -45,6 +45,21 @@ void drawContactInfoScreen(GtkWidget* window) {
   drawNextButton(main_box);
 }
 
+void drawAddressInfoScreen(GtkWidget* window) {
+  GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
+  gtk_container_add(GTK_CONTAINER(window), main_box);
+
+  drawHeader(main_box);
+  drawTitle(main_box, "3. Información de domicilio");
+
+  drawAddressDropdowns(main_box);
+  drawExactAddressBox(main_box);
+
+  drawPreviousButton(main_box);
+  drawNextButton(main_box);
+}
+
 void drawHeader(GtkWidget* container) {
   GtkWidget* header_label = gtk_label_new("REFUGIO APP");
   PangoAttrList* attrs = pango_attr_list_new();
@@ -138,6 +153,86 @@ void drawEmailBox(GtkWidget* container) {
   gtk_box_pack_start(GTK_BOX(email_box), domain_entry, FALSE, FALSE, 0);
   // pack box in container
   gtk_box_pack_start(GTK_BOX(container), email_box, FALSE, FALSE, 10);
+}
+
+void drawAddressDropdowns(GtkWidget* container) {
+  GtkWidget* dropdowns_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 15);
+  // provincia
+  GtkWidget* provincia_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+  GtkWidget* provincia_label = gtk_label_new("Provincia:");
+  gtk_widget_set_halign(provincia_label, GTK_ALIGN_START);
+  // lista de provincias
+  GtkWidget* provincia_combo = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Seleccionar provincia...");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "San José");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Alajuela");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Cartago");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Heredia");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Guanacaste");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Puntarenas");
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 "Limón");
+  gtk_combo_box_set_active(GTK_COMBO_BOX(provincia_combo), 0);
+  gtk_box_pack_start(GTK_BOX(provincia_box), provincia_label, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(provincia_box), provincia_combo, FALSE, FALSE, 0);
+  // cantones
+  GtkWidget* canton_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+  GtkWidget* canton_label = gtk_label_new("Cantón:");
+  gtk_widget_set_halign(canton_label, GTK_ALIGN_START);
+  GtkWidget* canton_combo = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo),
+                                 "Seleccionar cantón...");
+  // TODO: agregar lista de cantones segun provincia
+  gtk_combo_box_set_active(GTK_COMBO_BOX(canton_combo), 0);
+  gtk_box_pack_start(GTK_BOX(canton_box), canton_label, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(canton_box), canton_combo, FALSE, FALSE, 0);
+  // distritos
+  GtkWidget* distrito_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+  GtkWidget* distrito_label = gtk_label_new("Distrito:");
+  gtk_widget_set_halign(distrito_label, GTK_ALIGN_START);
+  GtkWidget* distrito_combo = gtk_combo_box_text_new();
+  // TODO: agregar lista de distritos segun canton
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo),
+                                 "Seleccionar distrito...");
+  gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
+  gtk_box_pack_start(GTK_BOX(distrito_box), distrito_label, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(distrito_box), distrito_combo, FALSE, FALSE, 0);
+  // all boxes in container
+  gtk_box_pack_start(GTK_BOX(dropdowns_box), provincia_box, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(dropdowns_box), canton_box, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(dropdowns_box), distrito_box, FALSE, FALSE, 0);
+  // dropdown container in main container
+  gtk_box_pack_start(GTK_BOX(container), dropdowns_box, FALSE, FALSE, 10);
+}
+
+void drawExactAddressBox(GtkWidget* container) {
+  GtkWidget* address_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+  GtkWidget* address_label = gtk_label_new("Dirección exacta:");
+  gtk_widget_set_halign(address_label, GTK_ALIGN_START);
+  // scrolled window
+  GtkWidget* scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+  gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_window),
+                                 GTK_POLICY_AUTOMATIC,
+                                 GTK_POLICY_AUTOMATIC);
+  gtk_widget_set_size_request(scrolled_window, 400, 120);
+  // for multi-line input
+  GtkWidget* text_view = gtk_text_view_new();
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
+  gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(text_view), FALSE);
+  // text view to scrolled window
+  gtk_container_add(GTK_CONTAINER(scrolled_window), text_view);
+  // components in box
+  gtk_box_pack_start(GTK_BOX(address_box), address_label, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(address_box), scrolled_window, TRUE, TRUE, 0);
+  // box in container
+  gtk_box_pack_start(GTK_BOX(container), address_box, FALSE, FALSE, 10);
 }
 
 void drawPreviousButton(GtkWidget* container) {

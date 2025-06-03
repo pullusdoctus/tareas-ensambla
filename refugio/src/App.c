@@ -39,7 +39,7 @@ void navigate_to_screen(AppScreen screen) {
       drawContactInfoScreen(main_window);
       break;
     case SCREEN_ADDRESS_INFO:
-      // TODO:
+      drawAddressInfoScreen(main_window);
       break;
     case SCREEN_VERIFICATION:
       // TODO:

@@ -16,9 +16,8 @@ typedef enum {
 
 void drawPersonalInfoScreen(GtkWidget* window);
 void drawContactInfoScreen(GtkWidget* window);
-// TODO:
-// void drawAddressInfoScreen();
-// void drawVerificationScreen();
+void drawAddressInfoScreen(GtkWidget* window);
+void drawVerificationScreen(GtkWidget* window);
 
 void drawHeader(GtkWidget* container);
 void drawTitle(GtkWidget* container, const char* title);
@@ -26,9 +25,9 @@ void drawInputBox(GtkWidget* container, const char* header, const char* placehol
 void drawDropdown(GtkWidget* container, const char* header, const char* placeholder);
 void drawRadialButtons(GtkWidget* container, const char* header, int button_count, char** legends);
 void drawEmailBox(GtkWidget* container);
+void drawAddressDropdowns(GtkWidget* container);
+void drawExactAddressBox(GtkWidget* container);
 void drawPreviousButton(GtkWidget* container);
 void drawNextButton(GtkWidget* container);
-// TODO:
-// void drawButton();
 
 #endif
