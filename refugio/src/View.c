@@ -60,6 +60,23 @@ void drawAddressInfoScreen(GtkWidget* window) {
   drawNextButton(main_box);
 }
 
+void drawVerificationScreen(GtkWidget* window) {
+  GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
+  gtk_container_add(GTK_CONTAINER(window), main_box);
+
+  drawHeader(main_box);
+  drawTitle(main_box, "4. Verificación");
+
+  char* legends[] = { "SMS", "Correo" };
+  drawRadialButtons(
+    main_box, "¿Dónde desea recibir su código de verificación?", 2, legends);
+  drawInputBox(main_box, "Código de verificación", "XXXXXXXX");
+
+  drawPreviousButton(main_box);
+  drawNextButton(main_box);
+}
+
 void drawHeader(GtkWidget* container) {
   GtkWidget* header_label = gtk_label_new("REFUGIO APP");
   PangoAttrList* attrs = pango_attr_list_new();

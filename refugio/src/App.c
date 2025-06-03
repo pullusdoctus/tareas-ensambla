@@ -42,7 +42,7 @@ void navigate_to_screen(AppScreen screen) {
       drawAddressInfoScreen(main_window);
       break;
     case SCREEN_VERIFICATION:
-      // TODO:
+      drawVerificationScreen(main_window);
       break;
     default:
       break;
