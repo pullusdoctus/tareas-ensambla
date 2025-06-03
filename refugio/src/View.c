@@ -1,3 +1,4 @@
+#include "../inc/App.h"
 #include "../inc/View.h"
 
 void drawPersonalInfoScreen(GtkWidget* window) {
@@ -23,6 +24,24 @@ void drawPersonalInfoScreen(GtkWidget* window) {
   char* legends[] = {"Masculino", "Femenino", "Otro/Prefiere no decir"};
   drawRadialButtons(main_box, "Género", 3, legends);
 
+  drawPreviousButton(main_box);
+  drawNextButton(main_box);
+}
+
+void drawContactInfoScreen(GtkWidget* window) {
+  GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
+  gtk_container_add(GTK_CONTAINER(window), main_box);
+
+  drawHeader(main_box);
+  drawTitle(main_box, "2. Información de contacto");
+
+  drawInputBox(main_box, "Teléfono", "XXXX-XXXX");
+  drawInputBox(main_box, "Teléfono alternativo", "XXXX-XXXX");
+
+  drawEmailBox(main_box);
+
+  drawPreviousButton(main_box);
   drawNextButton(main_box);
 }
 
@@ -101,8 +120,38 @@ void drawRadialButtons(GtkWidget* container, const char* header,
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
+void drawEmailBox(GtkWidget* container) {
+  GtkWidget* email_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+  // username input field
+  GtkWidget* username_entry = gtk_entry_new();
+  gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), "youremail");
+  gtk_widget_set_size_request(username_entry, 150, -1);
+  // @ label
+  GtkWidget* at_label = gtk_label_new("@");
+  // domain input field
+  GtkWidget* domain_entry = gtk_entry_new();
+  gtk_entry_set_placeholder_text(GTK_ENTRY(domain_entry), "email.com");
+  gtk_widget_set_size_request(domain_entry, 100, -1);
+  // pack components in box
+  gtk_box_pack_start(GTK_BOX(email_box), username_entry, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(email_box), at_label, FALSE, FALSE, 5);
+  gtk_box_pack_start(GTK_BOX(email_box), domain_entry, FALSE, FALSE, 0);
+  // pack box in container
+  gtk_box_pack_start(GTK_BOX(container), email_box, FALSE, FALSE, 10);
+}
+
+void drawPreviousButton(GtkWidget* container) {
+  GtkWidget* button = gtk_button_new_with_label("Volver");
+  gtk_widget_set_halign(button, GTK_ALIGN_START);
+  g_signal_connect(button, "clicked",
+                   G_CALLBACK(on_previous_button_clicked), NULL);
+  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 10);
+}
+
 void drawNextButton(GtkWidget* container) {
   GtkWidget* button = gtk_button_new_with_label("Siguiente");
   gtk_widget_set_halign(button, GTK_ALIGN_END);
+  g_signal_connect(button, "clicked",
+                   G_CALLBACK(on_next_button_clicked), NULL);
   gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 10);
 }
