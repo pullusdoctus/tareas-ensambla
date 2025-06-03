@@ -1,27 +1,14 @@
 # tareas-ensambla
 
-- [ ] Celda poblada
-- [ ] Celda no poblada
-- [ ] Inicio (cargar matriz, imprimir matriz)
+## tarea programada 2
 
-- [ ] Fin (chequear próxima celda, preguntar si quiere terminar)
+XD
 
-int main() {
-  cargarMatriz();
-  imprimirMatriz();
-  while (true) {
-   if (!quiereSeguir()) {
-    break;
-  }
-  for  (...) {
-    for (...) {
-      if (celdaPoblada) {
-        celdaPoblada();
-      } else {
-        celdaNoPoblada();
-      }
-    }
-  }
-  imprimirMatriz();
-  }
-}
+## lab refugio
+
+diseño en [Figma](https://www.figma.com/design/eT7W4yzsxkdKlzhQVOQ3oe/Lab-1--Prototipo-de-Sign-Up?node-id=1-2&t=aC9XhsB9MnjkVMtl-0)
+
+- [ ] información personal
+- [ ] información de contacto
+- [ ] información de domicilio
+- [ ] verificación
