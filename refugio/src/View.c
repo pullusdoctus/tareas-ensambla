@@ -6,26 +6,47 @@ void drawPersonalInfoScreen(GtkWidget* window) {
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
   gtk_container_add(GTK_CONTAINER(window), main_box);
 
-  drawHeader(main_box);
-  drawTitle(main_box, "1. Información Personal");
+  // caja horizontal para centrar
+  GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
 
-  drawInputBox(main_box, "Cédula o Pasaporte", "XX-XXXX-XXXX");
+  // campo izquierdo
+  GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
+
+  //  caja central
+  GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
+
+  // campo derecho
+  GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
+
+  drawHeader(content_box);
+  drawTitle(content_box, "1. Información Personal");
+
+  drawInputBox(content_box, "Cédula o Pasaporte", "XX-XXXX-XXXX");
 
   // caja para acomodar nombres y apellidos a la par
   GtkWidget* name_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
-  gtk_box_pack_start(GTK_BOX(main_box), name_box, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(content_box), name_box, FALSE, FALSE, 0);
 
   drawInputBox(name_box, "Nombre", "Su nombre");
   drawInputBox(name_box, "Apellidos", "Sus apellidos");
 
-  drawDropdown(main_box, "Fecha de nacimiento", "YYYY-MM-DD");
-  drawInputBox(main_box, "Contraseña", "Su contraseña");
+  drawDropdown(content_box, "Fecha de nacimiento", "YYYY-MM-DD");
+  drawInputBox(content_box, "Contraseña", "Su contraseña");
 
   char* legends[] = {"Masculino", "Femenino", "Otro/Prefiere no decir"};
-  drawRadialButtons(main_box, "Género", 3, legends);
+  drawRadialButtons(content_box, "Género", 3, legends);
 
-  drawPreviousButton(main_box);
-  drawNextButton(main_box);
+  // contenedor de botones
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
+  drawPreviousButton(button_box);
+  GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
+  drawNextButton(button_box);
 }
 
 void drawContactInfoScreen(GtkWidget* window) {
@@ -33,16 +54,37 @@ void drawContactInfoScreen(GtkWidget* window) {
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
   gtk_container_add(GTK_CONTAINER(window), main_box);
 
-  drawHeader(main_box);
-  drawTitle(main_box, "2. Información de contacto");
+  // caja horizontal para centrar
+  GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
 
-  drawInputBox(main_box, "Teléfono", "XXXX-XXXX");
-  drawInputBox(main_box, "Teléfono alternativo", "XXXX-XXXX");
+  // campo izquierdo
+  GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
 
-  drawEmailBox(main_box);
+  //  caja central
+  GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
 
-  drawPreviousButton(main_box);
-  drawNextButton(main_box);
+  // campo derecho
+  GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
+
+  drawHeader(content_box);
+  drawTitle(content_box, "2. Información de contacto");
+
+  drawInputBox(content_box, "Teléfono", "XXXX-XXXX");
+  drawInputBox(content_box, "Teléfono alternativo", "XXXX-XXXX");
+
+  drawEmailBox(content_box);
+
+  // contenedor de botones
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
+  drawPreviousButton(button_box);
+  GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
+  drawNextButton(button_box);
 }
 
 void drawAddressInfoScreen(GtkWidget* window) {
@@ -50,31 +92,68 @@ void drawAddressInfoScreen(GtkWidget* window) {
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
   gtk_container_add(GTK_CONTAINER(window), main_box);
 
-  drawHeader(main_box);
-  drawTitle(main_box, "3. Información de domicilio");
+  // caja horizontal para centrar
+  GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
 
-  drawAddressDropdowns(main_box);
-  drawExactAddressBox(main_box);
+  // campo izquierdo
+  GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
 
-  drawPreviousButton(main_box);
-  drawNextButton(main_box);
+  // caja central
+  GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
+
+  // campo derecho
+  GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
+
+  drawHeader(content_box);
+  drawTitle(content_box, "3. Información de domicilio");
+
+  drawAddressDropdowns(content_box);
+  drawExactAddressBox(content_box);
+
+  // contenedor de botones
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
+  drawPreviousButton(button_box);
+  GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
+  drawNextButton(button_box);
 }
 
 void drawVerificationScreen(GtkWidget* window) {
   GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
   gtk_container_add(GTK_CONTAINER(window), main_box);
+  // caja horizontal para centrar
+  GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
+  // campo izquierdo
+  GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
+  // caja central
+  GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
+  // campo derecho
+  GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
 
-  drawHeader(main_box);
-  drawTitle(main_box, "4. Verificación");
+  drawHeader(content_box);
+  drawTitle(content_box, "4. Verificación");
 
   char* legends[] = { "SMS", "Correo" };
   drawRadialButtons(
-    main_box, "¿Dónde desea recibir su código de verificación?", 2, legends);
-  drawInputBox(main_box, "Código de verificación", "XXXXXXXX");
-
-  drawPreviousButton(main_box);
-  drawNextButton(main_box);
+    content_box, "¿Dónde desea recibir su código de verificación?", 2, legends);
+  drawInputBox(content_box, "Código de verificación", "XXXXXXXX");
+  // contenedor de botones
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
+  drawPreviousButton(button_box);
+  GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
+  drawNextButton(button_box);
 }
 
 void drawHeader(GtkWidget* container) {
@@ -141,35 +220,38 @@ void drawRadialButtons(GtkWidget* container, const char* header,
   GtkWidget* label = gtk_label_new(header);
   gtk_label_set_xalign(GTK_LABEL(label), 0.0);
   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-
+  // horizontal box
+  GtkWidget* radio_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 15);
+  gtk_box_pack_start(GTK_BOX(vbox), radio_box, FALSE, FALSE, 0);
   GSList* group = NULL;
   for (int i = 0; i < button_count; ++i) {
     GtkWidget* radio = gtk_radio_button_new_with_label(group, legends[i]);
     group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio));
-    gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(radio_box), radio, FALSE, FALSE, 0);
   }
 
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
 void drawEmailBox(GtkWidget* container) {
+  GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
+  GtkWidget* label = gtk_label_new("Correo electrónico");
+  gtk_label_set_xalign(GTK_LABEL(label), 0.0);
+  gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
   GtkWidget* email_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
   // username input field
   GtkWidget* username_entry = gtk_entry_new();
   gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), "youremail");
-  gtk_widget_set_size_request(username_entry, 150, -1);
+  gtk_box_pack_start(GTK_BOX(email_box), username_entry, TRUE, TRUE, 0);
   // @ label
   GtkWidget* at_label = gtk_label_new("@");
+  gtk_box_pack_start(GTK_BOX(email_box), at_label, FALSE, FALSE, 5);
   // domain input field
   GtkWidget* domain_entry = gtk_entry_new();
   gtk_entry_set_placeholder_text(GTK_ENTRY(domain_entry), "email.com");
-  gtk_widget_set_size_request(domain_entry, 100, -1);
-  // pack components in box
-  gtk_box_pack_start(GTK_BOX(email_box), username_entry, FALSE, FALSE, 0);
-  gtk_box_pack_start(GTK_BOX(email_box), at_label, FALSE, FALSE, 5);
-  gtk_box_pack_start(GTK_BOX(email_box), domain_entry, FALSE, FALSE, 0);
-  // pack box in container
-  gtk_box_pack_start(GTK_BOX(container), email_box, FALSE, FALSE, 10);
+  gtk_box_pack_start(GTK_BOX(email_box), domain_entry, TRUE, TRUE, 0);
+  gtk_box_pack_start(GTK_BOX(vbox), email_box, FALSE, FALSE, 0);
+  gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
 void drawAddressDropdowns(GtkWidget* container) {
@@ -254,16 +336,14 @@ void drawExactAddressBox(GtkWidget* container) {
 
 void drawPreviousButton(GtkWidget* container) {
   GtkWidget* button = gtk_button_new_with_label("Volver");
-  gtk_widget_set_halign(button, GTK_ALIGN_START);
   g_signal_connect(button, "clicked",
                    G_CALLBACK(on_previous_button_clicked), NULL);
-  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 10);
+  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 5);
 }
 
 void drawNextButton(GtkWidget* container) {
   GtkWidget* button = gtk_button_new_with_label("Siguiente");
-  gtk_widget_set_halign(button, GTK_ALIGN_END);
   g_signal_connect(button, "clicked",
                    G_CALLBACK(on_next_button_clicked), NULL);
-  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 10);
+  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 5);
 }
