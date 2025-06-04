@@ -1,6 +1,40 @@
 #include "../inc/App.h"
 #include "../inc/View.h"
 
+void drawLoginScreen(GtkWidget* window) {
+  GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
+  gtk_container_add(GTK_CONTAINER(window), main_box);
+
+  GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
+
+  // campo izquierdo
+  GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
+
+  //  caja central
+  GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+  gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
+
+  // campo derecho
+  GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
+
+  drawHeader(content_box);
+  drawTitle(content_box, "LOGIN");
+
+  drawInputBox(content_box, "ID (cédula)", "X-XXXX-XXXX");
+  drawInputBox(content_box, "Contraseña", "Contraseña");
+
+  GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+  gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
+  drawRegisterButton(button_box);
+  GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+  gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
+  drawLoginButton(button_box);
+}
+
 void drawPersonalInfoScreen(GtkWidget* window) {
   GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
@@ -346,4 +380,18 @@ void drawNextButton(GtkWidget* container) {
   g_signal_connect(button, "clicked",
                    G_CALLBACK(on_next_button_clicked), NULL);
   gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 5);
+}
+
+void drawRegisterButton(GtkWidget* container) {
+  GtkWidget* button = gtk_button_new_with_label("Registrarse");
+  g_signal_connect(button, "clicked",
+                   G_CALLBACK(on_register_button_clicked), NULL);
+  gtk_box_pack_start(GTK_BOX(container), button, false, false, 5);
+}
+
+void drawLoginButton(GtkWidget* container) {
+  GtkWidget* button = gtk_button_new_with_label("Iniciar sesión");
+  g_signal_connect(button, "clicked",
+                   G_CALLBACK(on_login_button_clicked), NULL);
+  gtk_box_pack_start(GTK_BOX(container), button, false, false, 5);
 }

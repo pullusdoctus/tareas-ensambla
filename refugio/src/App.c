@@ -23,7 +23,7 @@ void on_activate(GtkApplication* app, gpointer user_data) {
   gtk_window_set_default_size(GTK_WINDOW(main_window), WIDTH, HEIGHT);
   gtk_window_set_position(GTK_WINDOW(main_window), GTK_WIN_POS_CENTER);
 
-  navigate_to_screen(SCREEN_PERSONAL_INFO);
+  navigate_to_screen(LOGIN);
 
   gtk_widget_show_all(main_window);
 }
@@ -32,6 +32,9 @@ void navigate_to_screen(AppScreen screen) {
   current_screen = screen;
   clear_window_content(main_window);
   switch (screen) {
+    case LOGIN:
+      drawLoginScreen(main_window);
+      break;
     case SCREEN_PERSONAL_INFO:
       drawPersonalInfoScreen(main_window);
       break;
@@ -64,6 +67,18 @@ void on_previous_button_clicked(GtkWidget* widget, gpointer data) {
   if (current_screen > 0) {
     navigate_to_screen(current_screen - 1);
   }
+}
+
+void on_register_button_clicked(GtkWidget* widget, gpointer data) {
+  (void)widget;
+  (void)data;
+  navigate_to_screen(SCREEN_PERSONAL_INFO);
+}
+
+void on_login_button_clicked(GtkWidget* widget, gpointer data) {
+  (void)widget;
+  (void)data;
+  return;
 }
 
 void clear_window_content(GtkWidget* window) {
