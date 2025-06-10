@@ -42,7 +42,7 @@ extern "C" void draw_matrix(uint8_t* matrix) {
     }
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(5000);  // Display for 1 second
+    SDL_Delay(1000);  // Display for 1 second
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
