@@ -161,6 +161,11 @@ int main(int argc, char** argv) {
                 } else if (mx >= buttonExit.x && mx <= buttonExit.x + buttonExit.w &&
                            my >= buttonExit.y && my <= buttonExit.y + buttonExit.h) {
                     running = false;
+                } else if (mx < matrixWidth && my < matrixWidth) {
+                    int x = mx / cellSize;
+                    int y = my / cellSize;
+                    int idx = y * gridSize + x;
+                    matrix[idx] = !matrix[idx];
                 }
             }
         }
