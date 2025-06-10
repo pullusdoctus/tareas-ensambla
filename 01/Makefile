@@ -1,8 +1,8 @@
 # assembler, linker, and flags
 AS = nasm
 LD = ld
-ASFLAGS = -f elf32
-LDFLAGS = -m elf_i386
+ASFLAGS = -f elf64
+# LDFLAGS = -m elf_i386
 
 # source and object files
 SRC = conway.asm
