@@ -1,253 +1,132 @@
-section .bss
+section .data
     global matrix
-    matrix resb 100          ; 10x10 matrix
+    matrix times 100 db 0           ; 10x10 matrix (100 cells)
 
 section .bss
-    matrix_next resb 100     ; temporary buffer for next state
+    matrix_next resb 100
 
 section .text
     global init_matrix
     global update_matrix
 
-; Initialize matrix with alternating pattern (0,1,0,1,...)
+; Initialize matrix with alternating 0s and 1s
 init_matrix:
     mov rcx, 100
     mov rdi, matrix
     mov al, 1
-
-.init_loop:
+.fill_loop:
     mov [rdi], al
     xor al, 1
     inc rdi
-    loop .init_loop
+    loop .fill_loop
     ret
 
-; update_matrix: computes next generation into matrix_next and copies back to matrix
+; Update matrix for next generation using Game of Life rules
 update_matrix:
-    ; rdi = matrix base
-    ; We'll hardcode matrix base as global label 'matrix'
-    ; Save registers used
-    push rbx
-    push rsi
-    push rdi
+    mov rbx, 0              ; index 0
+    mov rsi, matrix         ; current matrix base
+    mov rdi, matrix_next    ; next generation matrix base
+
+.update_loop:
     push rcx
-    push rdx
-
-    mov rsi, matrix          ; current matrix
-    mov rdi, matrix_next     ; next matrix buffer
-    mov rcx, 100             ; 100 cells
-    xor rbx, rbx             ; index i = 0
-
-.next_cell:
-    ; Calculate alive neighbors for cell rbx
-    xor rdx, rdx             ; rdx = neighbor count
-
-    ; Compute row and col of cell
-    mov r8, rbx              ; r8 = index
-    mov r9, 10
-    xor r10, r10
-    div r9                   ; rax = quotient (row), rdx = remainder (col)
-    mov r10, rax             ; row
-    mov r11, rdx             ; col
-
-    ; neighbors relative coords:
-    ; (-1,-1) (-1,0) (-1,1)
-    ; (0,-1)          (0,1)
-    ; (1,-1)  (1,0)  (1,1)
-
-    mov r12, r10            ; row copy
-    mov r13, r11            ; col copy
-
-    ; Check all 8 neighbors:
-    ; We'll write a macro below for checking neighbor validity and adding count
-
-    ; Macro equivalent inline:
-    ; For each neighbor delta (dr, dc):
-    ;   nr = row + dr
-    ;   nc = col + dc
-    ;   if 0 <= nr < 10 and 0 <= nc < 10 then
-    ;      idx = nr*10 + nc
-    ;      add matrix[idx] to rdx
-
-    ; We'll do this 8 times:
-
-    ; dr = -1, dc = -1
-    mov rax, r10
-    dec rax
-    cmp rax, -1
-    jle .skip_n1
-    mov rdi, r11
-    dec rdi
-    cmp rdi, -1
-    jle .skip_n1
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n1:
-
-    ; dr = -1, dc = 0
-    mov rax, r10
-    dec rax
-    cmp rax, -1
-    jle .skip_n2
-    mov rdi, r11
-    cmp rdi, 10
-    jge .skip_n2
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n2:
-
-    ; dr = -1, dc = 1
-    mov rax, r10
-    dec rax
-    cmp rax, -1
-    jle .skip_n3
-    mov rdi, r11
-    inc rdi
-    cmp rdi, 10
-    jge .skip_n3
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n3:
-
-    ; dr = 0, dc = -1
-    mov rax, r10
-    cmp rax, 10
-    jge .skip_n4
-    mov rdi, r11
-    dec rdi
-    cmp rdi, -1
-    jle .skip_n4
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n4:
-
-    ; dr = 0, dc = 1
-    mov rax, r10
-    cmp rax, 10
-    jge .skip_n5
-    mov rdi, r11
-    inc rdi
-    cmp rdi, 10
-    jge .skip_n5
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n5:
-
-    ; dr = 1, dc = -1
-    mov rax, r10
-    inc rax
-    cmp rax, 10
-    jge .skip_n6
-    mov rdi, r11
-    dec rdi
-    cmp rdi, -1
-    jle .skip_n6
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n6:
-
-    ; dr = 1, dc = 0
-    mov rax, r10
-    inc rax
-    cmp rax, 10
-    jge .skip_n7
-    mov rdi, r11
-    cmp rdi, 10
-    jge .skip_n7
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n7:
-
-    ; dr = 1, dc = 1
-    mov rax, r10
-    inc rax
-    cmp rax, 10
-    jge .skip_n8
-    mov rdi, r11
-    inc rdi
-    cmp rdi, 10
-    jge .skip_n8
-    mov rsi, matrix
-    mov rax, rax
-    imul rax, 10
-    add rax, rdi
-    movzx rbx, byte [rsi + rax]
-    add rdx, rbx
-.skip_n8:
-
-    ; Current cell state
-    mov rsi, matrix
-    movzx rbx, byte [rsi + rbx]
-
-    ; Apply Game of Life rules:
-    ; alive neighbors = rdx
-    ; current state = rbx (0 or 1)
-    cmp rbx, 1
-    jne .dead_cell
-    ; Cell alive
-    cmp rdx, 2
-    jl .dead_next
-    cmp rdx, 3
-    jg .dead_next
-    mov al, 1
-    jmp .store_result
-
-.dead_cell:
-    ; Cell dead
-    cmp rdx, 3
-    jne .dead_next
-    mov al, 1
-    jmp .store_result
-
-.dead_next:
-    mov al, 0
-
-.store_result:
-    mov rsi, rdi             ; matrix_next
-    mov rdi, rbx             ; current index (reuse rbx as index)
-    mov byte [rsi + rbx], al
+    mov rcx, rbx
+    call check_cell_state   ; returns new state in al
+    mov byte [rdi + rbx], al
+    pop rcx
 
     inc rbx
     cmp rbx, 100
-    jne .next_cell
+    jne .update_loop
 
-    ; Copy matrix_next back to matrix
+    ; Copy matrix_next to matrix
+    mov rcx, 100
     mov rsi, matrix_next
     mov rdi, matrix
-    mov rcx, 100
-    rep movsb
 
+.copy_loop:
+    mov al, [rsi]
+    mov [rdi], al
+    inc rsi
+    inc rdi
+    loop .copy_loop
+    ret
+
+; Calculate next cell state (Game of Life rules)
+; Input: rcx = cell index
+; Uses: rsi = matrix base pointer
+; Output: al = new state (0 or 1)
+check_cell_state:
+    push rbx
+    push rdx
+    xor rbx, rbx            ; neighbor count
+    mov rdx, rcx            ; current cell index
+
+    ; Neighbor offsets: -11, -10, -9, -1, +1, +9, +10, +11
+    mov rax, rdx
+    sub rax, 11
+    call count_if_alive
+    mov rax, rdx
+    sub rax, 10
+    call count_if_alive
+    mov rax, rdx
+    sub rax, 9
+    call count_if_alive
+    mov rax, rdx
+    dec rax
+    call count_if_alive
+    mov rax, rdx
+    inc rax
+    call count_if_alive
+    mov rax, rdx
+    add rax, 9
+    call count_if_alive
+    mov rax, rdx
+    add rax, 10
+    call count_if_alive
+    mov rax, rdx
+    add rax, 11
+    call count_if_alive
+
+    ; Current cell state
+    movzx rax, byte [rsi + rdx]
+
+    cmp rbx, 2
+    jl .die
+
+    cmp rbx, 3
+    je .live
+
+    cmp rbx, 3
+    jg .die
+
+.same:
+    mov al, byte [rsi + rdx]
+    jmp .end
+
+.live:
+    mov al, 1
+    jmp .end
+
+.die:
+    mov al, 0
+
+.end:
     pop rdx
-    pop rcx
-    pop rdi
-    pop rsi
     pop rbx
+    ret
+
+count_if_alive:
+    ; Input: rax = neighbor index
+    ; Uses: rsi = matrix base pointer, rbx = neighbor count
+    push rdi
+    push rbx
+    cmp rax, 0
+    jl .skip
+    cmp rax, 99
+    jg .skip
+    movzx rdi, byte [rsi + rax]
+    add rbx, rdi
+.skip:
+    pop rbx
+    pop rdi
     ret
