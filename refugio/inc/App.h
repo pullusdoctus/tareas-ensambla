@@ -9,7 +9,13 @@ extern GtkWidget* canton_combo;
 extern GtkWidget* distrito_combo;
 extern struct location_data_t* location_data;
 
+#define MAX_LINE_LENGTH 512
+
 void appStart(void);
+void init_location_data(void);
+province_t* find_or_add_province(int id, const char* name);
+county_t* find_or_add_county(province_t* prov, int id, const char* name);
+void add_district(county_t* county, int id, const char* name);
 void init_location_data(void);
 
 void on_activate(GtkApplication* app, gpointer user_data);

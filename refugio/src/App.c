@@ -191,137 +191,70 @@ struct selected_address_t get_selected_address(void) {
   return result;
 }
 
-void init_location_data(void) {
-  if (location_data) return; // Already initialized
-  location_data = create_location_data();
-  // Example data - replace with actual data loading
-  location_data->province_count = 7;
-  location_data->provinces = malloc(sizeof(province_t) * 7);
-  // San José
-  location_data->provinces[0].id = 1;
-  location_data->provinces[0].name = create_string_copy("San José");
-  location_data->provinces[0].county_count = 1;
-  location_data->provinces[0].counties = malloc(sizeof(county_t) * 1);
-  // Cantones San José
-  location_data->provinces[0].counties[0].id = 11;
-  location_data->provinces[0].counties[0].name = create_string_copy("San José");
-  location_data->provinces[0].counties[0].province_id = 1;
-  location_data->provinces[0].counties[0].district_count = 2;
-  location_data->provinces[0].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos San José
-  location_data->provinces[0].counties[0].districts[0].id = 111;
-  location_data->provinces[0].counties[0].districts[0].name = create_string_copy("Carmen");
-  location_data->provinces[0].counties[0].districts[0].county_id = 11;
-  location_data->provinces[0].counties[0].districts[1].id = 112;
-  location_data->provinces[0].counties[0].districts[1].name = create_string_copy("Merced");
-  location_data->provinces[0].counties[0].districts[1].county_id = 11;
-  // Alajuela
-  location_data->provinces[1].id = 2;
-  location_data->provinces[1].name = create_string_copy("Alajuela");
-  location_data->provinces[1].county_count = 1;
-  location_data->provinces[1].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Alajuela
-  location_data->provinces[1].counties[0].id = 21;
-  location_data->provinces[1].counties[0].name = create_string_copy("Alajuela");
-  location_data->provinces[1].counties[0].province_id = 2;
-  location_data->provinces[1].counties[0].district_count = 2;
-  location_data->provinces[1].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Alajuela
-  location_data->provinces[1].counties[0].districts[0].id = 211;
-  location_data->provinces[1].counties[0].districts[0].name = create_string_copy("Alajuela");
-  location_data->provinces[1].counties[0].districts[0].county_id = 21;
-  location_data->provinces[1].counties[0].districts[1].id = 212;
-  location_data->provinces[1].counties[0].districts[1].name = create_string_copy("San José");
-  location_data->provinces[1].counties[0].districts[1].county_id = 21;
-  // Cartago
-  location_data->provinces[2].id = 3;
-  location_data->provinces[2].name = create_string_copy("Cartago");
-  location_data->provinces[2].county_count = 1;
-  location_data->provinces[2].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Cartago
-  location_data->provinces[2].counties[0].id = 31;
-  location_data->provinces[2].counties[0].name = create_string_copy("Cartago");
-  location_data->provinces[2].counties[0].province_id = 3;
-  location_data->provinces[2].counties[0].district_count = 2;
-  location_data->provinces[2].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Cartago
-  location_data->provinces[2].counties[0].districts[0].id = 311;
-  location_data->provinces[2].counties[0].districts[0].name = create_string_copy("Oriental");
-  location_data->provinces[2].counties[0].districts[0].county_id = 31;
-  location_data->provinces[2].counties[0].districts[1].id = 312;
-  location_data->provinces[2].counties[0].districts[1].name = create_string_copy("Occidental");
-  location_data->provinces[2].counties[0].districts[1].county_id = 31;
-  // Heredia
-  location_data->provinces[3].id = 4;
-  location_data->provinces[3].name = create_string_copy("Heredia");
-  location_data->provinces[3].county_count = 1;
-  location_data->provinces[3].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Heredia
-  location_data->provinces[3].counties[0].id = 41;
-  location_data->provinces[3].counties[0].name = create_string_copy("Heredia");
-  location_data->provinces[3].counties[0].province_id = 4;
-  location_data->provinces[3].counties[0].district_count = 2;
-  location_data->provinces[3].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Heredia
-  location_data->provinces[3].counties[0].districts[0].id = 411;
-  location_data->provinces[3].counties[0].districts[0].name = create_string_copy("Heredia");
-  location_data->provinces[3].counties[0].districts[0].county_id = 41;
-  location_data->provinces[3].counties[0].districts[1].id = 412;
-  location_data->provinces[3].counties[0].districts[1].name = create_string_copy("Mercedes");
-  location_data->provinces[3].counties[0].districts[1].county_id = 41;
-  // Guanacaste
-  location_data->provinces[4].id = 5;
-  location_data->provinces[4].name = create_string_copy("Guanacaste");
-  location_data->provinces[4].county_count = 1;
-  location_data->provinces[4].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Guanacaste
-  location_data->provinces[4].counties[0].id = 51;
-  location_data->provinces[4].counties[0].name = create_string_copy("Liberia");
-  location_data->provinces[4].counties[0].province_id = 5;
-  location_data->provinces[4].counties[0].district_count = 2;
-  location_data->provinces[4].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Guanacaste
-  location_data->provinces[4].counties[0].districts[0].id = 511;
-  location_data->provinces[4].counties[0].districts[0].name = create_string_copy("Liberia");
-  location_data->provinces[4].counties[0].districts[0].county_id = 51;
-  location_data->provinces[4].counties[0].districts[1].id = 512;
-  location_data->provinces[4].counties[0].districts[1].name = create_string_copy("Cañas Dulces");
-  location_data->provinces[4].counties[0].districts[1].county_id = 51;
-  // Puntarenas
-  location_data->provinces[5].id = 6;
-  location_data->provinces[5].name = create_string_copy("Puntarenas");
-  location_data->provinces[5].county_count = 1;
-  location_data->provinces[5].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Puntarenas
-  location_data->provinces[5].counties[0].id = 61;
-  location_data->provinces[5].counties[0].name = create_string_copy("Puntarenas");
-  location_data->provinces[5].counties[0].province_id = 6;
-  location_data->provinces[5].counties[0].district_count = 2;
-  location_data->provinces[5].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Puntarenas
-  location_data->provinces[5].counties[0].districts[0].id = 611;
-  location_data->provinces[5].counties[0].districts[0].name = create_string_copy("Puntarenas");
-  location_data->provinces[5].counties[0].districts[0].county_id = 61;
-  location_data->provinces[5].counties[0].districts[1].id = 612;
-  location_data->provinces[5].counties[0].districts[1].name = create_string_copy("Pitahaya");
-  location_data->provinces[5].counties[0].districts[1].county_id = 61;
-  // Limón
-  location_data->provinces[6].id = 7;
-  location_data->provinces[6].name = create_string_copy("Limón");
-  location_data->provinces[6].county_count = 1;
-  location_data->provinces[6].counties = malloc(sizeof(county_t) * 1);
-  // Cantones Limón
-  location_data->provinces[6].counties[0].id = 71;
-  location_data->provinces[6].counties[0].name = create_string_copy("Limón");
-  location_data->provinces[6].counties[0].province_id = 7;
-  location_data->provinces[6].counties[0].district_count = 2;
-  location_data->provinces[6].counties[0].districts = malloc(sizeof(district_t) * 2);
-  // Distritos Limón
-  location_data->provinces[6].counties[0].districts[0].id = 711;
-  location_data->provinces[6].counties[0].districts[0].name = create_string_copy("Limón");
-  location_data->provinces[6].counties[0].districts[0].county_id = 71;
-  location_data->provinces[6].counties[0].districts[1].id = 712;
-  location_data->provinces[6].counties[0].districts[1].name = create_string_copy("Valle La Estrella");
-  location_data->provinces[6].counties[0].districts[1].county_id = 71;
+province_t* find_or_add_province(int id, const char* name) {
+  for (int i = 0; i < (int)location_data->province_count; ++i) {
+    if (location_data->provinces[i].id == id) {
+      return &location_data->provinces[i];
+    }
+  }
+  // Add new province
+  location_data->provinces = realloc(location_data->provinces,
+      sizeof(province_t) * (location_data->province_count + 1));
+  province_t* prov = &location_data->provinces[location_data->province_count++];
+  prov->id = id;
+  prov->name = create_string_copy(name);
+  prov->county_count = 0;
+  prov->counties = NULL;
+  return prov;
 }
 
+county_t* find_or_add_county(province_t* prov, int id, const char* name) {
+  for (int i = 0; i < (int)prov->county_count; ++i) {
+    if (prov->counties[i].id == id) {
+      return &prov->counties[i];
+    }
+  }
+  // Add new county
+  prov->counties = realloc(prov->counties,
+      sizeof(county_t) * (prov->county_count + 1));
+  county_t* county = &prov->counties[prov->county_count++];
+  county->id = id;
+  county->province_id = prov->id;
+  county->name = create_string_copy(name);
+  county->district_count = 0;
+  county->districts = NULL;
+  return county;
+}
+
+void add_district(county_t* county, int id, const char* name) {
+  county->districts = realloc(county->districts,
+      sizeof(district_t) * (county->district_count + 1));
+  district_t* dist = &county->districts[county->district_count++];
+  dist->id = id;
+  dist->name = create_string_copy(name);
+  dist->county_id = county->id;
+}
+
+void init_location_data(void) {
+  if (location_data) return;
+  location_data = malloc(sizeof(struct location_data_t));
+  location_data->province_count = 0;
+  location_data->provinces = NULL;
+  FILE* file = fopen("locations.csv", "r");
+  if (!file) {
+    perror("Error opening CSV file");
+    exit(EXIT_FAILURE);
+  }
+  char line[MAX_LINE_LENGTH];
+  while (fgets(line, sizeof(line), file)) {
+    int pid, cid, did;
+    char pname[64], cname[64], dname[64];
+    if (sscanf(line, "%d,%63[^,],%d,%63[^,],%d,%63[^\n]",
+               &pid, pname, &cid, cname, &did, dname) == 6) {
+      province_t* prov = find_or_add_province(pid, pname);
+      county_t* county = find_or_add_county(prov, cid, cname);
+      add_district(county, did, dname);
+    }
+  }
+  fclose(file);
+}

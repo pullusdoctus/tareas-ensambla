@@ -1,0 +1,15 @@
+province_id,province_name,county_id,county_name,district_id,district_name
+1,San José,11,San José,111,Carmen
+1,San José,11,San José,112,Merced
+2,Alajuela,21,Alajuela,211,Alajuela
+2,Alajuela,21,Alajuela,212,San José
+3,Cartago,31,Cartago,311,Oriental
+3,Cartago,31,Cartago,312,Occidental
+4,Heredia,41,Heredia,411,Heredia
+4,Heredia,41,Heredia,412,Mercedes
+5,Guanacaste,51,Liberia,511,Liberia
+5,Guanacaste,51,Liberia,512,Cañas Dulces
+6,Puntarenas,61,Puntarenas,611,Puntarenas
+6,Puntarenas,61,Puntarenas,612,Pitahaya
+7,Limón,71,Limón,711,Limón
+7,Limón,71,Limón,712,Valle La Estrella
