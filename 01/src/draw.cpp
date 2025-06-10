@@ -1,38 +1,32 @@
-// draw.cpp
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <cstdint>
-#include <string>
+#include <iostream>
 
-extern "C" void draw_matrix(uint8_t* matrix) {
-    const int cellSize = 40;
-    const int gridSize = 10;
-    const int matrixWidth = cellSize * gridSize;
-    const int buttonWidth = 120;
-    const int buttonHeight = 50;
-    const int buttonMargin = 20;
-    const int windowWidth = matrixWidth + buttonWidth + buttonMargin * 3;
-    const int windowHeight = matrixWidth;
-    const int cellGap = 6;
-    
+extern "C" {
+    extern uint8_t matrix[100];
+    void init_matrix();
+    void update_matrix();
+}
+
+const int cellSize = 40;
+const int gridSize = 10;
+const int matrixWidth = cellSize * gridSize;
+const int buttonWidth = 120;
+const int buttonHeight = 50;
+const int buttonMargin = 20;
+const int windowWidth = matrixWidth + buttonWidth + buttonMargin * 3;
+const int windowHeight = matrixWidth;
+const int cellGap = 6;
+
+void draw_matrix(SDL_Renderer* renderer, uint8_t* matrix, TTF_Font* font) {
     // Colors
     const SDL_Color bgColor = {30, 30, 40, 255};
     const SDL_Color gridColor = {60, 60, 80, 255};
     const SDL_Color cellColor = {0, 220, 120, 255};
     const SDL_Color buttonColor = {70, 70, 90, 255};
-    const SDL_Color buttonHoverColor = {90, 90, 110, 255};
     const SDL_Color textColor = {255, 255, 255, 255};
 
-    SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();
-    
-    SDL_Window* window = SDL_CreateWindow("Game of Life", 
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-        windowWidth, windowHeight, 0);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    
-    TTF_Font* font = TTF_OpenFont("./font/PressStart2P-Regular.ttf", 16);
-    // Clear background
     SDL_SetRenderDrawColor(renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a);
     SDL_RenderClear(renderer);
 
@@ -41,92 +35,143 @@ extern "C" void draw_matrix(uint8_t* matrix) {
         for (int x = 0; x < gridSize; ++x) {
             int idx = y * gridSize + x;
             if (matrix[idx]) {
-                SDL_Rect rect = { 
-                    x * cellSize + cellGap/2, 
-                    y * cellSize + cellGap/2, 
-                    cellSize - cellGap, 
-                    cellSize - cellGap 
+                SDL_Rect rect = {
+                    x * cellSize + cellGap / 2,
+                    y * cellSize + cellGap / 2,
+                    cellSize - cellGap,
+                    cellSize - cellGap
                 };
                 SDL_SetRenderDrawColor(renderer, cellColor.r, cellColor.g, cellColor.b, cellColor.a);
                 SDL_RenderFillRect(renderer, &rect);
-                
-                // Soft borders
+
                 SDL_SetRenderDrawColor(renderer, 0, 0, 0, 60);
                 SDL_RenderDrawRect(renderer, &rect);
             }
         }
     }
 
-    // Draw grid
+    // Draw grid lines
     SDL_SetRenderDrawColor(renderer, gridColor.r, gridColor.g, gridColor.b, gridColor.a);
     for (int i = 0; i <= gridSize; ++i) {
         SDL_RenderDrawLine(renderer, i * cellSize, 0, i * cellSize, matrixWidth);
         SDL_RenderDrawLine(renderer, 0, i * cellSize, matrixWidth, i * cellSize);
     }
 
-    // Calculate button positions
+    // Draw buttons
     int buttonX = matrixWidth + buttonMargin;
     int button1Y = windowHeight / 2 - buttonHeight - buttonMargin / 2;
     int button2Y = windowHeight / 2 + buttonMargin / 2;
 
-    // Draw "Sig. Gen" button
-    SDL_Rect button1 = {buttonX, button1Y, buttonWidth, buttonHeight};
+    SDL_Rect buttonNext = {buttonX, button1Y, buttonWidth, buttonHeight};
+    SDL_Rect buttonExit = {buttonX, button2Y, buttonWidth, buttonHeight};
+
     SDL_SetRenderDrawColor(renderer, buttonColor.r, buttonColor.g, buttonColor.b, buttonColor.a);
-    SDL_RenderFillRect(renderer, &button1);
-    SDL_SetRenderDrawColor(renderer, 100, 100, 120, 255);
-    SDL_RenderDrawRect(renderer, &button1);
+    SDL_RenderFillRect(renderer, &buttonNext);
+    SDL_RenderFillRect(renderer, &buttonExit);
 
-    // Draw "Salir" button
-    SDL_Rect button2 = {buttonX, button2Y, buttonWidth, buttonHeight};
-    SDL_SetRenderDrawColor(renderer, buttonColor.r, buttonColor.g, buttonColor.b, buttonColor.a);
-    SDL_RenderFillRect(renderer, &button2);
-    SDL_SetRenderDrawColor(renderer, 100, 100, 120, 255);
-    SDL_RenderDrawRect(renderer, &button2);
+    // Draw button text
+    SDL_Surface* surfNext = TTF_RenderText_Blended(font, "Next", textColor);
+    SDL_Surface* surfExit = TTF_RenderText_Blended(font, "Exit", textColor);
 
-    // Draw button text (if font loaded successfully)
-    if (font) {
-        // "Sig. Gen" text
-        SDL_Surface* textSurface1 = TTF_RenderText_Solid(font, "Next", textColor);
-        if (textSurface1) {
-            SDL_Texture* textTexture1 = SDL_CreateTextureFromSurface(renderer, textSurface1);
-            int textW1, textH1;
-            SDL_QueryTexture(textTexture1, NULL, NULL, &textW1, &textH1);
-            SDL_Rect textRect1 = {
-                buttonX + (buttonWidth - textW1) / 2,
-                button1Y + (buttonHeight - textH1) / 2,
-                textW1, textH1
-            };
-            SDL_RenderCopy(renderer, textTexture1, NULL, &textRect1);
-            SDL_DestroyTexture(textTexture1);
-            SDL_FreeSurface(textSurface1);
-        }
+    SDL_Texture* texNext = SDL_CreateTextureFromSurface(renderer, surfNext);
+    SDL_Texture* texExit = SDL_CreateTextureFromSurface(renderer, surfExit);
 
-        // "Salir" text
-        SDL_Surface* textSurface2 = TTF_RenderText_Solid(font, "Exit", textColor);
-        if (textSurface2) {
-            SDL_Texture* textTexture2 = SDL_CreateTextureFromSurface(renderer, textSurface2);
-            int textW2, textH2;
-            SDL_QueryTexture(textTexture2, NULL, NULL, &textW2, &textH2);
-            SDL_Rect textRect2 = {
-                buttonX + (buttonWidth - textW2) / 2,
-                button2Y + (buttonHeight - textH2) / 2,
-                textW2, textH2
-            };
-            SDL_RenderCopy(renderer, textTexture2, NULL, &textRect2);
-            SDL_DestroyTexture(textTexture2);
-            SDL_FreeSurface(textSurface2);
-        }
-    }
+    int tw, th;
+    SDL_QueryTexture(texNext, nullptr, nullptr, &tw, &th);
+    SDL_Rect dstNext = {buttonX + (buttonWidth - tw)/2, button1Y + (buttonHeight - th)/2, tw, th};
+    SDL_QueryTexture(texExit, nullptr, nullptr, &tw, &th);
+    SDL_Rect dstExit = {buttonX + (buttonWidth - tw)/2, button2Y + (buttonHeight - th)/2, tw, th};
+
+    SDL_RenderCopy(renderer, texNext, nullptr, &dstNext);
+    SDL_RenderCopy(renderer, texExit, nullptr, &dstExit);
+
+    SDL_DestroyTexture(texNext);
+    SDL_DestroyTexture(texExit);
+    SDL_FreeSurface(surfNext);
+    SDL_FreeSurface(surfExit);
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(1000);  // Display for 1 second
+}
 
-    // Cleanup
-    if (font) {
-        TTF_CloseFont(font);
+int main(int argc, char** argv) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        std::cerr << "SDL Init failed: " << SDL_GetError() << "\n";
+        return 1;
     }
-    TTF_Quit();
+
+    if (TTF_Init() != 0) {
+        std::cerr << "TTF Init failed: " << TTF_GetError() << "\n";
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Window* window = SDL_CreateWindow("Conway's Game of Life",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        windowWidth, windowHeight, SDL_WINDOW_SHOWN);
+
+    if (!window) {
+        std::cerr << "Window creation failed: " << SDL_GetError() << "\n";
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (!renderer) {
+        std::cerr << "Renderer creation failed: " << SDL_GetError() << "\n";
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
+    TTF_Font* font = TTF_OpenFont("./font/PressStart2P-Regular.ttf", 24);
+    if (!font) {
+        std::cerr << "Font loading failed: " << TTF_GetError() << "\n";
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        TTF_Quit();
+        SDL_Quit();
+        return 1;
+    }
+
+    init_matrix();
+
+    bool running = true;
+    SDL_Event event;
+
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int mx = event.button.x;
+                int my = event.button.y;
+
+                int buttonX = matrixWidth + buttonMargin;
+                int button1Y = windowHeight / 2 - buttonHeight - buttonMargin / 2;
+                int button2Y = windowHeight / 2 + buttonMargin / 2;
+
+                SDL_Rect buttonNext = {buttonX, button1Y, buttonWidth, buttonHeight};
+                SDL_Rect buttonExit = {buttonX, button2Y, buttonWidth, buttonHeight};
+
+                if (mx >= buttonNext.x && mx <= buttonNext.x + buttonNext.w &&
+                    my >= buttonNext.y && my <= buttonNext.y + buttonNext.h) {
+                    update_matrix();
+                } else if (mx >= buttonExit.x && mx <= buttonExit.x + buttonExit.w &&
+                           my >= buttonExit.y && my <= buttonExit.y + buttonExit.h) {
+                    running = false;
+                }
+            }
+        }
+        draw_matrix(renderer, matrix, font);
+        SDL_Delay(10);  // Small delay to reduce CPU usage
+    }
+
+    TTF_CloseFont(font);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    TTF_Quit();
     SDL_Quit();
+    return 0;
 }
