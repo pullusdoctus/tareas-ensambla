@@ -6,16 +6,15 @@ section .data
     prompt db 'Type "quit" to exit, or any other key to continue...', 10
     prompt_len equ $ - prompt
     quit_msg db 'quit', 10 ; "quit" + newline
-    ;sigint_msg db 10, 'Detected CTRL-C. Exiting...', 10
-    ;sigint_len equ $ - sigint_msg
 
 section .bss
     buffer resb 5           ; Store up to 4 chars + newline
     cell resb 1             ; a byte to store each cell's char
-    ;sigact resb 152        ; sizeof(struct sigaction) = 152 bytes (64-bit)
 
 section .text
 global main
+
+extern draw_matrix
 
 main:
     ; Initialize the matrix
@@ -23,21 +22,11 @@ main:
     mov rdi, matrix        ; Destination index pointing to matrix
     mov al, 1              ; Starting value (1)
 
-    ; Setup sigint handler
-    ;mov dword [sigact], handle_sigint       ; sa_handler
-    ;mov dword [sigact+8], 0x04000000       ; SA_RESTART flag
-    ;mov eax, 13                            ; sys_rt_sigaction
-    ;mov ebx, 2                             ; SIGINT
-    ;mov ecx, sigact                        ; act
-    ;mov edx, 0                             ; oldact (NULL)
-    ;mov esi, 8                             ; sigsetsize
-    ;ret
-
-fill_matrix: 
+fill_matrix:
     mov [rdi], al          ; Store the value (0 or 1) in the matrix
     xor al, 1              ; Toggle between 0 and 1
     inc rdi                ; Move to next element
-    loop fill_matrix       ; Repeat until ecx is 0
+    loop fill_matrix       ; Repeat until rcx is 0
 
     ; Print initial matrix
     call print_matrix
@@ -47,18 +36,18 @@ simulation_loop:
     call clear_buffer
 
     ; Print prompt
-    mov rax, 4             ; sys_write
-    mov rbx, 1             ; stdout
-    mov rcx, prompt
+    mov rax, 1             ; sys_write
+    mov rdi, 1             ; stdout
+    mov rsi, prompt
     mov rdx, prompt_len
-    ret
+    syscall
 
     ; Read user input
-    mov rax, 3             ; sys_read
-    mov rbx, 0             ; stdin
-    mov rcx, buffer
+    mov rax, 0             ; sys_read
+    mov rdi, 0             ; stdin
+    mov rsi, buffer
     mov rdx, 5             ; read up to 5 bytes (chars)
-    ret
+    syscall
 
     ; Check for 'quit'
     mov rcx, 4             ; compare first 4 bytes
@@ -69,7 +58,7 @@ simulation_loop:
 
     ; Update all cells
     mov rsi, matrix
-    mov rdi, 0
+    xor rdi, rdi
     mov rcx, 100  ; 100 cells in total
 
 update_cells:
@@ -83,64 +72,11 @@ update_cells:
     call print_matrix
     jmp simulation_loop
 
-extern draw_matrix
-
 print_matrix:
     mov rdi, matrix
     call draw_matrix
     ret
-    
-print_row: 
-    push rcx               ; Save row counter
-    mov rcx, 10            ; 10 columns
 
-print_column: 
-    movzx rax, byte [esi]  ; Get the current element
-    
-    ; Convert number to ASCII and print
-    add al, '0'            ; Convert to ASCII
-    mov [cell], al         ; move ASCII to cell buffer
-    
-    push rcx               ; Save column counter
-    mov rax, 4             ; sys_write
-    mov rbx, 1             ; stdout
-    mov rcx, cell          ; address of current element
-    mov rdx, 1             ; length to write
-    ret               ; call kernel
-    pop rcx                ; Restore column counter
-    
-    ; Print space
-    push rcx               ; Save column counter
-    mov rax, 4
-    mov rbx, 1
-    mov rcx, space
-    mov rdx, 1
-    ret
-    pop rcx                ; Restore column counter
-    
-    inc rsi                ; Move to next element
-    loop print_column
-
-    ; Print newline at end of row
-    push rcx               ; Save row counter
-    mov rax, 4
-    mov rbx, 1
-    mov rcx, newline
-    mov rdx, 1
-    ret
-    pop rcx                ; Restore row counter
-
-    pop rcx                ; Restore rows-left counter (go to next row)
-    loop print_row
-
-    ret
-
-    mov rsi, matrix
-    mov rdi, 55  ; Example: check cell at position 55 (row 5, column 5)
-    call check_cell_state
-    ; Result is in al (0 or 1)
-
-; Function to check if a cell will be alive or dead in the next generation
 check_cell_state:
     push rbx
     push rcx
@@ -177,14 +113,13 @@ check_cell_state:
     ; Apply Conway's Game of Life rules
     movzx rax, byte [rsi + rdi]  ; Get current state of the cell
     cmp rcx, 2
-    jl .die       
-    je .same      
+    jl .die
+    je .same
     cmp rcx, 3
-    je .live      
-    jg .die      
+    je .live
+    jg .die
 
 .same:
-
     jmp .end
 
 .live:
@@ -200,10 +135,8 @@ check_cell_state:
     pop rbx
     ret
 
-; Function to count live neighbors
 count_if_alive:
     push rax
-    
     
     cmp rbx, 0
     jl .skip
@@ -225,7 +158,6 @@ clear_buffer:
     ret
 
 exit:
-    call clear_buffer
-    mov rax, 1
-    xor rbx, rbx
-    ret
+    mov rax, 60    ; sys_exit
+    xor rdi, rdi   ; status 0
+    syscall
