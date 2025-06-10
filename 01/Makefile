@@ -23,8 +23,8 @@ all: $(BIN)
 
 # build binary
 $(BIN): $(OBJ) | $(BIN_DIR)
-	$(CXX) $(OBJ) -o $@ $(LDFLAGS) -lSDL2
-	#$(CXX) $(LDFLAGS) $(OBJ) -o $@
+	$(CXX) $(OBJ) -o $@ $(LDFLAGS) -lSDL2 -lSDL2_ttf
+
 
 # assemble asm file
 $(ASM_OBJ): $(ASM_SRC) | $(BUILD_DIR)
