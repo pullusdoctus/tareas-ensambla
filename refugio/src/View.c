@@ -187,7 +187,7 @@ void drawVerificationScreen(GtkWidget* window) {
   drawPreviousButton(button_box);
   GtkWidget* button_space = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(button_box), button_space, TRUE, TRUE, 0);
-  drawNextButton(button_box);
+  drawFinishButton(button_box);
 }
 
 void drawHeader(GtkWidget* container) {
@@ -379,6 +379,13 @@ void drawNextButton(GtkWidget* container) {
   GtkWidget* button = gtk_button_new_with_label("Siguiente");
   g_signal_connect(button, "clicked",
                    G_CALLBACK(on_next_button_clicked), NULL);
+  gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 5);
+}
+
+void drawFinishButton(GtkWidget* container) {
+  GtkWidget* button = gtk_button_new_with_label("Terminar");
+  g_signal_connect(button, "clicked",
+                   G_CALLBACK(on_finish_button_clicked), NULL);
   gtk_box_pack_start(GTK_BOX(container), button, FALSE, FALSE, 5);
 }
 

@@ -69,6 +69,13 @@ void on_previous_button_clicked(GtkWidget* widget, gpointer data) {
   }
 }
 
+void on_finish_button_clicked(GtkWidget* widget, gpointer data) {
+  (void)widget;
+  (void)data;
+  GtkApplication* app = gtk_window_get_application(GTK_WINDOW(gtk_widget_get_toplevel(widget)));
+  g_application_quit(G_APPLICATION(app));
+}
+
 void on_register_button_clicked(GtkWidget* widget, gpointer data) {
   (void)widget;
   (void)data;

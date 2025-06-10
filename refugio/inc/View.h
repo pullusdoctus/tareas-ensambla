@@ -32,6 +32,7 @@ void drawExactAddressBox(GtkWidget* container);
 
 void drawPreviousButton(GtkWidget* container);
 void drawNextButton(GtkWidget* container);
+void drawFinishButton(GtkWidget* container);
 void drawRegisterButton(GtkWidget* container);
 void drawLoginButton(GtkWidget* container);
 
