@@ -4,10 +4,10 @@
 #include "View.h"
 #include "Location.h"
 
-static GtkWidget* provincia_combo = NULL;
-static GtkWidget* canton_combo = NULL;
-static GtkWidget* distrito_combo = NULL;
-static struct location_data_t* location_data = NULL;
+extern GtkWidget* provincia_combo;
+extern GtkWidget* canton_combo;
+extern GtkWidget* distrito_combo;
+extern struct location_data_t* location_data;
 
 void appStart(void);
 void init_location_data(void);
