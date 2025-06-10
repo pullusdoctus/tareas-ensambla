@@ -122,32 +122,27 @@ void drawContactInfoScreen(GtkWidget* window) {
 }
 
 void drawAddressInfoScreen(GtkWidget* window) {
+  // Initialize location data if not already done
+  init_location_data();
   GtkWidget* main_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
   gtk_container_set_border_width(GTK_CONTAINER(main_box), 20);
   gtk_container_add(GTK_CONTAINER(window), main_box);
-
   // caja horizontal para centrar
   GtkWidget* center_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(main_box), center_box, TRUE, TRUE, 0);
-
   // campo izquierdo
   GtkWidget* left_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(center_box), left_spacer, TRUE, TRUE, 0);
-
   // caja central
   GtkWidget* content_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
   gtk_box_pack_start(GTK_BOX(center_box), content_box, FALSE, FALSE, 0);
-
   // campo derecho
   GtkWidget* right_spacer = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_start(GTK_BOX(center_box), right_spacer, TRUE, TRUE, 0);
-
   drawHeader(content_box);
   drawTitle(content_box, "3. Información de domicilio");
-
   drawAddressDropdowns(content_box);
   drawExactAddressBox(content_box);
-
   // contenedor de botones
   GtkWidget* button_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
   gtk_box_pack_start(GTK_BOX(content_box), button_box, FALSE, FALSE, 10);
@@ -294,46 +289,38 @@ void drawAddressDropdowns(GtkWidget* container) {
   GtkWidget* provincia_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
   GtkWidget* provincia_label = gtk_label_new("Provincia:");
   gtk_widget_set_halign(provincia_label, GTK_ALIGN_START);
-  // lista de provincias
-  GtkWidget* provincia_combo = gtk_combo_box_text_new();
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Seleccionar provincia...");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "San José");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Alajuela");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Cartago");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Heredia");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Guanacaste");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Puntarenas");
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
-                                 "Limón");
+  // Create provincia combo and store reference
+  provincia_combo = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo), "Seleccionar provincia...");
+  // Populate provinces from data
+  for (size_t i = 0; i < location_data->province_count; i++) {
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(provincia_combo),
+                                 location_data->provinces[i].name);
+  }
   gtk_combo_box_set_active(GTK_COMBO_BOX(provincia_combo), 0);
+  // Connect signal for province changes
+  g_signal_connect(provincia_combo, "changed", G_CALLBACK(on_province_changed), NULL);
   gtk_box_pack_start(GTK_BOX(provincia_box), provincia_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(provincia_box), provincia_combo, FALSE, FALSE, 0);
   // cantones
   GtkWidget* canton_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
   GtkWidget* canton_label = gtk_label_new("Cantón:");
   gtk_widget_set_halign(canton_label, GTK_ALIGN_START);
-  GtkWidget* canton_combo = gtk_combo_box_text_new();
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo),
-                                 "Seleccionar cantón...");
-  // TODO: agregar lista de cantones segun provincia
+  // Create canton combo and store reference
+  canton_combo = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo), "Seleccionar cantón...");
   gtk_combo_box_set_active(GTK_COMBO_BOX(canton_combo), 0);
+  // Connect signal for canton changes
+  g_signal_connect(canton_combo, "changed", G_CALLBACK(on_canton_changed), NULL);
   gtk_box_pack_start(GTK_BOX(canton_box), canton_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(canton_box), canton_combo, FALSE, FALSE, 0);
   // distritos
   GtkWidget* distrito_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
   GtkWidget* distrito_label = gtk_label_new("Distrito:");
   gtk_widget_set_halign(distrito_label, GTK_ALIGN_START);
-  GtkWidget* distrito_combo = gtk_combo_box_text_new();
-  // TODO: agregar lista de distritos segun canton
-  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo),
-                                 "Seleccionar distrito...");
+  // Create distrito combo and store reference
+  distrito_combo = gtk_combo_box_text_new();
+  gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), "Seleccionar distrito...");
   gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
   gtk_box_pack_start(GTK_BOX(distrito_box), distrito_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(distrito_box), distrito_combo, FALSE, FALSE, 0);

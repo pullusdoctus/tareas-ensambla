@@ -15,6 +15,33 @@ void appStart(void) {
   g_object_unref(app);
 }
 
+void init_location_data(void) {
+  if (location_data) return; // Already initialized
+  location_data = create_location_data();
+  // Example data - replace with actual data loading
+  location_data->province_count = 7;
+  location_data->provinces = malloc(sizeof(province_t) * 7);
+  // San José
+  location_data->provinces[0].id = 1;
+  location_data->provinces[0].name = create_string_copy("San José");
+  location_data->provinces[0].county_count = 3; // Example
+  location_data->provinces[0].counties = malloc(sizeof(county_t) * 3);
+  // Example counties for San José
+  location_data->provinces[0].counties[0].id = 101;
+  location_data->provinces[0].counties[0].name = create_string_copy("San José");
+  location_data->provinces[0].counties[0].province_id = 1;
+  location_data->provinces[0].counties[0].district_count = 2;
+  location_data->provinces[0].counties[0].districts = malloc(sizeof(district_t) * 2);
+  // Example districts
+  location_data->provinces[0].counties[0].districts[0].id = 10101;
+  location_data->provinces[0].counties[0].districts[0].name = create_string_copy("Carmen");
+  location_data->provinces[0].counties[0].districts[0].county_id = 101;
+  location_data->provinces[0].counties[0].districts[1].id = 10102;
+  location_data->provinces[0].counties[0].districts[1].name = create_string_copy("Merced");
+  location_data->provinces[0].counties[0].districts[1].county_id = 101;
+  // TODO: Add more example data as needed...
+}
+
 void on_activate(GtkApplication* app, gpointer user_data) {
   (void)user_data;
 
@@ -51,6 +78,66 @@ void navigate_to_screen(AppScreen screen) {
       break;
   }
   gtk_widget_show_all(main_window);
+}
+
+void on_province_changed(GtkComboBox* combo, gpointer user_data) {
+  (void)user_data;
+  gint active = gtk_combo_box_get_active(combo);
+  if (active <= 0) { // 0 is "Seleccionar provincia..."
+    // Clear canton and distrito dropdowns
+    gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(canton_combo));
+    gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(distrito_combo));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo), "Seleccionar cantón...");
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), "Seleccionar distrito...");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(canton_combo), 0);
+    gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
+    return;
+  }
+  // Find the selected province (active-1 because first item is placeholder)
+  if (active-1 < (gint)location_data->province_count) {
+    province_t* selected_province = &location_data->provinces[active-1];
+    // Clear and populate canton dropdown
+    gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(canton_combo));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo), "Seleccionar cantón...");
+    for (size_t i = 0; i < selected_province->county_count; i++) {
+      gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(canton_combo),
+                                   selected_province->counties[i].name);
+    }
+    gtk_combo_box_set_active(GTK_COMBO_BOX(canton_combo), 0);
+    // Clear distrito dropdown
+    gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(distrito_combo));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), "Seleccionar distrito...");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
+  }
+}
+
+// Callback for canton selection change
+void on_canton_changed(GtkComboBox* combo, gpointer user_data) {
+  (void)user_data;
+  gint province_active = gtk_combo_box_get_active(GTK_COMBO_BOX(provincia_combo));
+  gint canton_active = gtk_combo_box_get_active(combo);
+  if (province_active <= 0 || canton_active <= 0) {
+    // Clear distrito dropdown
+    gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(distrito_combo));
+    gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), "Seleccionar distrito...");
+    gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
+    return;
+  }
+  // Find selected province and canton
+  if (province_active-1 < (gint)location_data->province_count) {
+    province_t* selected_province = &location_data->provinces[province_active-1];
+    if (canton_active-1 < (gint)selected_province->county_count) {
+      county_t* selected_county = &selected_province->counties[canton_active-1];
+      // Clear and populate distrito dropdown
+      gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(distrito_combo));
+      gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), "Seleccionar distrito...");
+      for (size_t i = 0; i < selected_county->district_count; i++) {
+        gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(distrito_combo), 
+                                     selected_county->districts[i].name);
+      }
+      gtk_combo_box_set_active(GTK_COMBO_BOX(distrito_combo), 0);
+    }
+  }
 }
 
 void on_next_button_clicked(GtkWidget* widget, gpointer data) {
@@ -94,4 +181,34 @@ void clear_window_content(GtkWidget* window) {
     gtk_widget_destroy(GTK_WIDGET(iter->data));
   }
   g_list_free(children);
+}
+
+void cleanup_address_dropdowns(void) {
+  if (location_data) {
+    destroy_location_data(location_data);
+    location_data = NULL;
+  }
+}
+
+struct selected_address_t get_selected_address(void) {
+  struct selected_address_t result = {0};
+  gint province_active = gtk_combo_box_get_active(GTK_COMBO_BOX(provincia_combo));
+  gint canton_active = gtk_combo_box_get_active(GTK_COMBO_BOX(canton_combo));
+  gint distrito_active = gtk_combo_box_get_active(GTK_COMBO_BOX(distrito_combo));
+  if (province_active > 0 && province_active-1 < (gint)location_data->province_count) {
+    struct province_t* province = &location_data->provinces[province_active-1];
+    result.province_id = province->id;
+    result.province_name = province->name;
+    if (canton_active > 0 && canton_active-1 < (gint)province->county_count) {
+      struct county_t* county = &province->counties[canton_active-1];
+      result.county_id = county->id;
+      result.county_name = county->name;
+      if (distrito_active > 0 && distrito_active-1 < (gint)county->district_count) {
+        struct district_t* district = &county->districts[distrito_active-1];
+        result.district_id = district->id;
+        result.district_name = district->name;
+      }
+    }
+  }
+  return result;
 }
