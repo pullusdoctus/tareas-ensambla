@@ -1,4 +1,5 @@
 section .data
+    global matrix
     matrix times 100 db 0  ; 10x10 matrix (100 elements)
     newline db 10          ; ASCII code for newline
     space db ' '           ; ASCII code for space
@@ -14,9 +15,9 @@ section .bss
     ;sigact resb 152        ; sizeof(struct sigaction) = 152 bytes (64-bit)
 
 section .text
-global _start
+global main
 
-_start: 
+main:
     ; Initialize the matrix
     mov rcx, 100           ; Counter for 100 elements
     mov rdi, matrix        ; Destination index pointing to matrix
@@ -30,7 +31,7 @@ _start:
     ;mov ecx, sigact                        ; act
     ;mov edx, 0                             ; oldact (NULL)
     ;mov esi, 8                             ; sigsetsize
-    ;int 0x80
+    ;ret
 
 fill_matrix: 
     mov [rdi], al          ; Store the value (0 or 1) in the matrix
@@ -50,14 +51,14 @@ simulation_loop:
     mov rbx, 1             ; stdout
     mov rcx, prompt
     mov rdx, prompt_len
-    int 0x80
+    ret
 
     ; Read user input
     mov rax, 3             ; sys_read
     mov rbx, 0             ; stdin
     mov rcx, buffer
     mov rdx, 5             ; read up to 5 bytes (chars)
-    int 0x80
+    ret
 
     ; Check for 'quit'
     mov rcx, 4             ; compare first 4 bytes
@@ -82,10 +83,13 @@ update_cells:
     call print_matrix
     jmp simulation_loop
 
-print_matrix:
-    mov rcx, 10            ; 10 rows
-    mov rsi, matrix        ; Source index pointing to matrix
+extern draw_matrix
 
+print_matrix:
+    mov rdi, matrix
+    call draw_matrix
+    ret
+    
 print_row: 
     push rcx               ; Save row counter
     mov rcx, 10            ; 10 columns
@@ -102,7 +106,7 @@ print_column:
     mov rbx, 1             ; stdout
     mov rcx, cell          ; address of current element
     mov rdx, 1             ; length to write
-    int 0x80               ; call kernel
+    ret               ; call kernel
     pop rcx                ; Restore column counter
     
     ; Print space
@@ -111,7 +115,7 @@ print_column:
     mov rbx, 1
     mov rcx, space
     mov rdx, 1
-    int 0x80
+    ret
     pop rcx                ; Restore column counter
     
     inc rsi                ; Move to next element
@@ -123,7 +127,7 @@ print_column:
     mov rbx, 1
     mov rcx, newline
     mov rdx, 1
-    int 0x80
+    ret
     pop rcx                ; Restore row counter
 
     pop rcx                ; Restore rows-left counter (go to next row)
@@ -224,4 +228,4 @@ exit:
     call clear_buffer
     mov rax, 1
     xor rbx, rbx
-    int 0x80
+    ret
