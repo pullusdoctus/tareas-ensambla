@@ -1,6 +1,6 @@
 #include "../inc/App.h"
 #include "../inc/requests.h"
-#include "../inc/Usuario.h"
+#include "../inc/User.h"
 
 int main(void) {
   char* url = "https://rickandmortyapi.com/api/character/175";
@@ -21,9 +21,9 @@ int main(void) {
     int error = req_get_last_error();
     printf("Failed to get data.\nError: %d", error);
   }
-  Usuario usuario;
-  populate(&usuario, buffer);
-  printf("%s\n", usuario.id);
+  User user;
+  populate(&user, buffer);
+  printf("\n\tid: %s\n\tname: %s\n", user.id, user.name);
   req_cleanup();
   return 0;
 }

@@ -7,7 +7,7 @@ typedef struct {
   // informacion personal
   char id[10];                          // id
   char name[MAX_STR_LEN];               // name
-  char last_names[MAX_STR_LEN];         // type
+  char surnames[MAX_STR_LEN];           // type
   int birth_year;                       // created
   int birth_month;
   int birth_day;
@@ -22,8 +22,8 @@ typedef struct {
   char canton[MAX_STR_LEN];             // san jose
   char district[MAX_STR_LEN];           // san jose
   char exact_address[MAX_STR_LEN];      // origin.name
-} Usuario;
+} User;
 
-void populate(Usuario* usuario, char* buffer);
+void populate(User* user, char* buffer);
 
 #endif
