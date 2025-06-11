@@ -4,16 +4,17 @@
 
 void populate(Usuario* usuario, char* buffer) {
   char str[MAX_STR_LEN];
-  char* ptr, comma_ptr;
+  char* ptr, *comma_ptr;
   // encontrar id
   ptr = strstr(buffer, "{\"id\":");
-  ptr += 7;
+  ptr += 6;
   comma_ptr = strstr(ptr, ",");
+  int size = comma_ptr - ptr;
   while (ptr != comma_ptr) {
     char c = *ptr;
-    strncat(str, c, 1);
+    strncat(str, &c, 1);
     ++ptr;
   }
-  usuario->id = str;
-  str = "";
+  strncpy(usuario->id, str, size);
+  str[0] = '\0';
 }

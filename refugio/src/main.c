@@ -1,5 +1,6 @@
 #include "../inc/App.h"
 #include "../inc/requests.h"
+#include "../inc/Usuario.h"
 
 int main(void) {
   char* url = "https://rickandmortyapi.com/api/character/175";
@@ -22,6 +23,7 @@ int main(void) {
   }
   Usuario usuario;
   populate(&usuario, buffer);
+  printf("%s\n", usuario.id);
   req_cleanup();
   return 0;
 }
