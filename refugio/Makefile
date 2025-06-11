@@ -4,6 +4,7 @@
 SRC_DIR		:= src
 ASM_DIR		:= $(SRC_DIR)/asm
 INC_DIR		:= inc
+LIB_DIR		:= lib
 RSC_DIR		:= rsc
 BUILD_DIR	:= build
 BIN_DIR		:= bin
@@ -20,6 +21,8 @@ XCFLAGS		:= $(CFLAGS)
 AS			:= nasm
 ASFLAGS		:= -f elf64
 GTKFLAGS	:= $(shell pkg-config --cflags --libs gtk+-3.0)
+LDFLAGS		:= -L$(LIB_DIR)
+LIBS			:= -lrequest
 # -----------------------------------------
 
 # File variables
@@ -45,7 +48,7 @@ all: $(TARGET)
 # Create executable
 $(TARGET): $(OBJS)
 	mkdir -p $(BIN_DIR)
-	$(CC) -o $@ $^ $(GTKFLAGS)
+	$(CC) -o $@ $^ $(LDFLAGS) $(GTKFLAGS) $(LIBS)
 # -----------------------------------------
 
 # Run the executable
