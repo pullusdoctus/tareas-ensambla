@@ -22,7 +22,7 @@ AS			:= nasm
 ASFLAGS		:= -f elf64
 GTKFLAGS	:= $(shell pkg-config --cflags --libs gtk+-3.0)
 LDFLAGS		:= -L$(LIB_DIR)
-LIBS			:= -lrequest
+LIBS			:= -l:requests.a -lssl -lcrypto
 # -----------------------------------------
 
 # File variables
