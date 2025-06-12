@@ -1,3 +1,0 @@
-nasm -f elf64 conway.asm -o conway.o
-g++ -c draw.cpp -o draw.o `sdl2-config --cflags`
-g++ -no-pie conway.o draw.o -o sim `sdl2-config --libs`
