@@ -1,7 +1,7 @@
 #include "../inc/App.h"
 #include "../inc/requests.h"
 #include "../inc/User.h"
-
+/*
 int main(void) {
   char* url = "https://rickandmortyapi.com/api/character/175";
   char buffer[1025];
@@ -26,13 +26,12 @@ int main(void) {
   printf("\n\tid: %s\n\tname: %s\n", user.id, user.name);
   req_cleanup();
   return 0;
-}
+}*/
 
-/*
 int main(void) {
   appStart();
   return 0;
-}*/
+}
 
 // TODO: generar myObj.name de la respuesta json
 // avisarle al profe para poder hacer post al servidor

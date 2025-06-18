@@ -214,38 +214,49 @@ void drawTitle(GtkWidget* container, const char* title) {
 void drawInputBox(GtkWidget* container, const char* header,
                   const char* placeholder) {
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
-
   GtkWidget* label = gtk_label_new(header);
   gtk_label_set_xalign(GTK_LABEL(label), 0.0);
   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-
   GtkWidget* entry = gtk_entry_new();
   gtk_entry_set_placeholder_text(GTK_ENTRY(entry), placeholder);
   gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, FALSE, 0);
-
+  // Store references based on the header text
+  if (strcmp(header, "ID (cédula)") == 0 || strcmp(header, "Cédula o Pasaporte") == 0) {
+    id_entry = entry;
+  } else if (strcmp(header, "Nombre") == 0) {
+    name_entry = entry;
+  } else if (strcmp(header, "Apellidos") == 0) {
+    surnames_entry = entry;
+  } else if (strcmp(header, "Contraseña") == 0) {
+    password_entry = entry;
+  } else if (strcmp(header, "Teléfono") == 0) {
+    phone_entry = entry;
+  } else if (strcmp(header, "Teléfono alternativo") == 0) {
+    alt_phone_entry = entry;
+  }
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
 void drawDropdown(GtkWidget* container, const char* header,
                   const char* placeholder) {
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 2);
-
   GtkWidget* label = gtk_label_new(header);
   gtk_label_set_xalign(GTK_LABEL(label), 0.0);
   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
-
   GtkWidget* combo = gtk_combo_box_text_new_with_entry();
   GtkWidget* entry = gtk_bin_get_child(GTK_BIN(combo));
   gtk_entry_set_placeholder_text(GTK_ENTRY(entry), placeholder);
   gtk_box_pack_start(GTK_BOX(vbox), combo, FALSE, FALSE, 0);
-
+  // Store reference for birth date
+  if (strcmp(header, "Fecha de nacimiento") == 0) {
+    birth_combo = combo;
+  }
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
 void drawRadialButtons(GtkWidget* container, const char* header,
                        int button_count, char** legends) {
   GtkWidget* vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
-
   GtkWidget* label = gtk_label_new(header);
   gtk_label_set_xalign(GTK_LABEL(label), 0.0);
   gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
@@ -257,8 +268,11 @@ void drawRadialButtons(GtkWidget* container, const char* header,
     GtkWidget* radio = gtk_radio_button_new_with_label(group, legends[i]);
     group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio));
     gtk_box_pack_start(GTK_BOX(radio_box), radio, FALSE, FALSE, 0);
+    // Store gender radio button references
+    if (strcmp(header, "Género") == 0 && i < 3) {
+      gender_radios[i] = radio;
+    }
   }
-
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
 
@@ -272,6 +286,7 @@ void drawEmailBox(GtkWidget* container) {
   GtkWidget* username_entry = gtk_entry_new();
   gtk_entry_set_placeholder_text(GTK_ENTRY(username_entry), "youremail");
   gtk_box_pack_start(GTK_BOX(email_box), username_entry, TRUE, TRUE, 0);
+  email_username_entry = username_entry; // Store reference
   // @ label
   GtkWidget* at_label = gtk_label_new("@");
   gtk_box_pack_start(GTK_BOX(email_box), at_label, FALSE, FALSE, 5);
@@ -279,6 +294,7 @@ void drawEmailBox(GtkWidget* container) {
   GtkWidget* domain_entry = gtk_entry_new();
   gtk_entry_set_placeholder_text(GTK_ENTRY(domain_entry), "email.com");
   gtk_box_pack_start(GTK_BOX(email_box), domain_entry, TRUE, TRUE, 0);
+  email_domain_entry = domain_entry; // Store reference
   gtk_box_pack_start(GTK_BOX(vbox), email_box, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(container), vbox, FALSE, FALSE, 5);
 }
