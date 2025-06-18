@@ -5,7 +5,7 @@
 
 typedef struct {
   // informacion personal
-  char id[10];                          // id
+  char id[MAX_STR_LEN];                 // id
   char name[MAX_STR_LEN];               // name
   char surnames[MAX_STR_LEN];           // type
   int birth_year;                       // created

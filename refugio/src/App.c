@@ -32,7 +32,6 @@ User current_user;
 void appStart(void) {
   GtkApplication* app =
     gtk_application_new("com.app.refugio", G_APPLICATION_DEFAULT_FLAGS);
-  init_widget_references();
   g_signal_connect(app, "activate", G_CALLBACK(on_activate), NULL);
   g_application_run(G_APPLICATION(app), 0, NULL);
   g_object_unref(app);
@@ -45,6 +44,7 @@ void on_activate(GtkApplication* app, gpointer user_data) {
   gtk_window_set_title(GTK_WINDOW(main_window), "refugio app");
   gtk_window_set_default_size(GTK_WINDOW(main_window), WIDTH, HEIGHT);
   gtk_window_set_position(GTK_WINDOW(main_window), GTK_WIN_POS_CENTER);
+  init_form_widgets();
 
   navigate_to_screen(LOGIN);
 
@@ -140,6 +140,19 @@ void on_next_button_clicked(GtkWidget* widget, gpointer data) {
   (void)widget;
   (void)data;
   if (current_screen < SCREEN_COUNT - 1) {
+    switch (current_screen) {
+      case SCREEN_PERSONAL_INFO:
+        collect_personal_info();
+        break;
+      case SCREEN_CONTACT_INFO:
+        collect_contact_info();
+        break;
+      case SCREEN_ADDRESS_INFO:
+        collect_address_info();
+        break;
+      default:
+        break;
+    }
     navigate_to_screen(current_screen + 1);
   }
 }
@@ -156,9 +169,9 @@ void on_finish_button_clicked(GtkWidget* widget, gpointer data) {
   (void)widget;
   (void)data;
   GtkApplication* app = gtk_window_get_application(GTK_WINDOW(gtk_widget_get_toplevel(widget)));
-  g_application_quit(G_APPLICATION(app));
-  collect_user_data();
   print_user_data(&current_user);
+  cleanup_form_widgets();
+  g_application_quit(G_APPLICATION(app));
 }
 
 void on_register_button_clicked(GtkWidget* widget, gpointer data) {
@@ -279,88 +292,134 @@ void init_location_data(void) {
   fclose(file);
 }
 
-void collect_user_data(void) {
+void collect_personal_info(void) {
   // Clear the user struct
   memset(&current_user, 0, sizeof(User));
-  // Personal Info
-  if (id_entry) {
+  // Personal Info - with NULL checks
+  if (id_entry && GTK_IS_ENTRY(id_entry)) {
     const char* id_text = gtk_entry_get_text(GTK_ENTRY(id_entry));
-    strncpy(current_user.id, id_text, sizeof(current_user.id) - 1);
-  }
-  if (name_entry) {
-    const char* name_text = gtk_entry_get_text(GTK_ENTRY(name_entry));
-    strncpy(current_user.name, name_text, sizeof(current_user.name) - 1);
-  }
-  if (surnames_entry) {
-    const char* surnames_text = gtk_entry_get_text(GTK_ENTRY(surnames_entry));
-    strncpy(current_user.surnames, surnames_text, sizeof(current_user.surnames) - 1);
-  }
-  if (password_entry) {
-    const char* password_text = gtk_entry_get_text(GTK_ENTRY(password_entry));
-    strncpy(current_user.password, password_text, sizeof(current_user.password) - 1);
-  }
-  // Birth date (you'll need to parse this from birth_combo)
-  if (birth_combo) {
-    const char* birth_text = gtk_entry_get_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(birth_combo))));
-    // Simple parsing assuming YYYY-MM-DD format
-    if (strlen(birth_text) >= 10) {
-      char year_str[5], month_str[3], day_str[3];
-      strncpy(year_str, birth_text, 4);
-      year_str[4] = '\0';
-      strncpy(month_str, birth_text + 5, 2);
-      month_str[2] = '\0';
-      strncpy(day_str, birth_text + 8, 2);
-      day_str[2] = '\0';
-      current_user.birth_year = atoi(year_str);
-      current_user.birth_month = atoi(month_str);
-      current_user.birth_day = atoi(day_str);
+    if (id_text) {
+      strncpy(current_user.id, id_text, sizeof(current_user.id) - 1);
+      current_user.id[sizeof(current_user.id) - 1] = '\0'; // Ensure null termination
     }
   }
-  // Gender from radio buttons
-  for (int i = 0; i < 3; i++) {
-    if (gender_radios[i] && gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gender_radios[i]))) {
-      switch(i) {
-        case 0: strcpy(current_user.gender, "Masculino"); break;
-        case 1: strcpy(current_user.gender, "Femenino"); break;
-        case 2: strcpy(current_user.gender, "Otro/Prefiere no decir"); break;
+  if (name_entry && GTK_IS_ENTRY(name_entry)) {
+    const char* name_text = gtk_entry_get_text(GTK_ENTRY(name_entry));
+    if (name_text) {
+      strncpy(current_user.name, name_text, sizeof(current_user.name) - 1);
+      current_user.name[sizeof(current_user.name) - 1] = '\0';
+    }
+  }
+  if (surnames_entry && GTK_IS_ENTRY(surnames_entry)) {
+    const char* surnames_text = gtk_entry_get_text(GTK_ENTRY(surnames_entry));
+    if (surnames_text) {
+      strncpy(current_user.surnames, surnames_text, sizeof(current_user.surnames) - 1);
+      current_user.surnames[sizeof(current_user.surnames) - 1] = '\0';
+    }
+  }
+  if (password_entry && GTK_IS_ENTRY(password_entry)) {
+    const char* password_text = gtk_entry_get_text(GTK_ENTRY(password_entry));
+    if (password_text) {
+      strncpy(current_user.password, password_text, sizeof(current_user.password) - 1);
+      current_user.password[sizeof(current_user.password) - 1] = '\0';
+    }
+  }
+  // Birth date with NULL checks
+  if (birth_combo && GTK_IS_COMBO_BOX(birth_combo)) {
+    GtkWidget* child = gtk_bin_get_child(GTK_BIN(birth_combo));
+    if (child && GTK_IS_ENTRY(child)) {
+      const char* birth_text = gtk_entry_get_text(GTK_ENTRY(child));
+      if (birth_text && strlen(birth_text) >= 10) {
+        // Simple parsing assuming YYYY-MM-DD format
+        char year_str[5], month_str[3], day_str[3];
+        memset(year_str, 0, sizeof(year_str));
+        memset(month_str, 0, sizeof(month_str));
+        memset(day_str, 0, sizeof(day_str));
+        strncpy(year_str, birth_text, 4);
+        strncpy(month_str, birth_text + 5, 2);
+        strncpy(day_str, birth_text + 8, 2);
+        current_user.birth_year = atoi(year_str);
+        current_user.birth_month = atoi(month_str);
+        current_user.birth_day = atoi(day_str);
       }
+    }
+  }
+  // Gender from radio buttons with NULL checks
+  for (int i = 0; i < 3; i++) {
+    if (gender_radios[i] && GTK_IS_RADIO_BUTTON(gender_radios[i]) && 
+        gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(gender_radios[i]))) {
+      switch(i) {
+        case 0: 
+          strncpy(current_user.gender, "Masculino", sizeof(current_user.gender) - 1);
+          break;
+        case 1: 
+          strncpy(current_user.gender, "Femenino", sizeof(current_user.gender) - 1);
+          break;
+        case 2: 
+          strncpy(current_user.gender, "Otro/Prefiere no decir", sizeof(current_user.gender) - 1);
+          break;
+      }
+      current_user.gender[sizeof(current_user.gender) - 1] = '\0';
       break;
     }
   }
-  // Contact Info
-  if (phone_entry) {
+}
+
+void collect_contact_info(void) {
+  // Contact Info with NULL checks
+  if (phone_entry && GTK_IS_ENTRY(phone_entry)) {
     const char* phone_text = gtk_entry_get_text(GTK_ENTRY(phone_entry));
-    strncpy(current_user.phone_number, phone_text, sizeof(current_user.phone_number) - 1);
+    if (phone_text) {
+      strncpy(current_user.phone_number, phone_text, sizeof(current_user.phone_number) - 1);
+      current_user.phone_number[sizeof(current_user.phone_number) - 1] = '\0';
+    }
   }
-  if (alt_phone_entry) {
+  if (alt_phone_entry && GTK_IS_ENTRY(alt_phone_entry)) {
     const char* alt_phone_text = gtk_entry_get_text(GTK_ENTRY(alt_phone_entry));
-    strncpy(current_user.alt_phone_number, alt_phone_text, sizeof(current_user.alt_phone_number) - 1);
+    if (alt_phone_text) {
+      strncpy(current_user.alt_phone_number, alt_phone_text, sizeof(current_user.alt_phone_number) - 1);
+      current_user.alt_phone_number[sizeof(current_user.alt_phone_number) - 1] = '\0';
+    }
   }
-  if (email_username_entry && email_domain_entry) {
+  // Email with NULL checks
+  if (email_username_entry && GTK_IS_ENTRY(email_username_entry) && 
+      email_domain_entry && GTK_IS_ENTRY(email_domain_entry)) {
     const char* username = gtk_entry_get_text(GTK_ENTRY(email_username_entry));
     const char* domain = gtk_entry_get_text(GTK_ENTRY(email_domain_entry));
-    snprintf(current_user.email, sizeof(current_user.email), "%s@%s", username, domain);
+    if (username && domain) {
+      snprintf(current_user.email, sizeof(current_user.email), "%s@%s", username, domain);
+      current_user.email[sizeof(current_user.email) - 1] = '\0';
+    }
   }
-  // Address Info
+}
+
+void collect_address_info(void) {
+  // Address Info with NULL checks
   struct selected_address_t address = get_selected_address();
   if (address.province_name) {
     strncpy(current_user.province, address.province_name, sizeof(current_user.province) - 1);
+    current_user.province[sizeof(current_user.province) - 1] = '\0';
   }
   if (address.county_name) {
     strncpy(current_user.canton, address.county_name, sizeof(current_user.canton) - 1);
+    current_user.canton[sizeof(current_user.canton) - 1] = '\0';
   }
   if (address.district_name) {
     strncpy(current_user.district, address.district_name, sizeof(current_user.district) - 1);
+    current_user.district[sizeof(current_user.district) - 1] = '\0';
   }
-  // Exact address from text view
-  if (exact_address_textview) {
+  // Exact address from text view with NULL checks
+  if (exact_address_textview && GTK_IS_TEXT_VIEW(exact_address_textview)) {
     GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(exact_address_textview));
-    GtkTextIter start, end;
-    gtk_text_buffer_get_bounds(buffer, &start, &end);
-    char* exact_address_text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-    if (exact_address_text) {
-      strncpy(current_user.exact_address, exact_address_text, sizeof(current_user.exact_address) - 1);
-      g_free(exact_address_text);
+    if (buffer && GTK_IS_TEXT_BUFFER(buffer)) {
+      GtkTextIter start, end;
+      gtk_text_buffer_get_bounds(buffer, &start, &end);
+      char* exact_address_text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+      if (exact_address_text) {
+        strncpy(current_user.exact_address, exact_address_text, sizeof(current_user.exact_address) - 1);
+        current_user.exact_address[sizeof(current_user.exact_address) - 1] = '\0';
+        g_free(exact_address_text);
+      }
     }
   }
 }
@@ -383,7 +442,26 @@ void print_user_data(const User* user) {
   printf("==============================\n\n");
 }
 
-void init_widget_references(void) {
+void init_form_widgets() {
+  id_entry = gtk_entry_new();
+  name_entry = gtk_entry_new();
+  surnames_entry = gtk_entry_new();
+  password_entry = gtk_entry_new();
+  birth_combo = gtk_combo_box_text_new();
+  phone_entry = gtk_entry_new();
+  alt_phone_entry = gtk_entry_new();
+  email_username_entry = gtk_entry_new();
+  email_domain_entry = gtk_entry_new();
+  exact_address_textview = gtk_text_view_new();
+  for (int i = 0; i < 3; i++) {
+    gender_radios[i] = gtk_radio_button_new_with_label(
+      i == 0 ? NULL : gtk_radio_button_get_group(GTK_RADIO_BUTTON(gender_radios[0])),
+      (i == 0) ? "Male" : (i == 1) ? "Female" : "Other"
+    );
+  }
+}
+
+void cleanup_form_widgets() {
   id_entry = NULL;
   name_entry = NULL;
   surnames_entry = NULL;
@@ -394,7 +472,6 @@ void init_widget_references(void) {
   email_username_entry = NULL;
   email_domain_entry = NULL;
   exact_address_textview = NULL;
-  // Initialize gender radio array
   for (int i = 0; i < 3; i++) {
     gender_radios[i] = NULL;
   }

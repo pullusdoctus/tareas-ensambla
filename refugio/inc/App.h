@@ -21,7 +21,6 @@ extern GtkWidget* email_domain_entry;
 
 // Address Info widgets
 extern GtkWidget* exact_address_textview;
-
 extern GtkWidget* provincia_combo;
 extern GtkWidget* canton_combo;
 extern GtkWidget* distrito_combo;
@@ -33,7 +32,8 @@ extern User current_user;
 
 void appStart(void);
 void init_location_data(void);
-void init_widget_references(void);
+void init_form_widgets(void);
+void cleanup_form_widgets(void);
 province_t* find_or_add_province(int id, const char* name);
 county_t* find_or_add_county(province_t* prov, int id, const char* name);
 void add_district(county_t* county, int id, const char* name);
@@ -56,7 +56,9 @@ void cleanup_address_dropdowns(void);
 
 struct selected_address_t get_selected_address(void);
 
-void collect_user_data(void);
+void collect_personal_info(void);
+void collect_contact_info(void);
+void collect_address_info(void);
 void print_user_data(const User* user);
 
 #endif

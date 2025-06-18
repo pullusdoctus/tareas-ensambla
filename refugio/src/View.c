@@ -359,11 +359,10 @@ void drawExactAddressBox(GtkWidget* container) {
                                  GTK_POLICY_AUTOMATIC);
   gtk_widget_set_size_request(scrolled_window, 400, 120);
   // for multi-line input
-  GtkWidget* text_view = gtk_text_view_new();
-  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_view), GTK_WRAP_WORD);
-  gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(text_view), FALSE);
+  gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(exact_address_textview), GTK_WRAP_WORD);
+  gtk_text_view_set_accepts_tab(GTK_TEXT_VIEW(exact_address_textview), FALSE);
   // text view to scrolled window
-  gtk_container_add(GTK_CONTAINER(scrolled_window), text_view);
+  gtk_container_add(GTK_CONTAINER(scrolled_window), exact_address_textview);
   // components in box
   gtk_box_pack_start(GTK_BOX(address_box), address_label, FALSE, FALSE, 0);
   gtk_box_pack_start(GTK_BOX(address_box), scrolled_window, TRUE, TRUE, 0);
